@@ -1,0 +1,16 @@
+{
+  "name": "Hot Dog Addon",
+  "version": "1.0",
+  "manifest_version": 1,
+  "description": "Hot Dog に入力した情報とECサイトの管理画面情報を相互に連携させる機能を提供します。",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://localhost/toltol/public/lstyle"
+      ],
+      "js": [
+        "script.js"
+      ]
+    }
+  ]
+}
