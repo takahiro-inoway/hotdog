@@ -235,7 +235,7 @@
                           </span>
                         </div>
                       </div>
-                      <button @click="ls_md.jan_add(detail_ind)" class="button is-link is-outlined is-small">Add+</button>
+                      <button @click="ls_md.add_jan(detail_ind)" class="button is-link is-outlined is-small">Add+</button>
                     </div>
                   </div>
                 </div>
@@ -319,7 +319,7 @@
             <!--*********************************************************************************************-->
           </div>
           <div class="">
-            <button @click="ls_md.shop_detail_add()" class="button is-link is-outlined is-small">Add+</button>
+            <button @click="ls_md.add_shop_detail()" class="button is-link is-outlined is-small">Add+</button>
           </div>
         </div>
         <div v-if="ls_pp.active_panel_sub === 'other_tool_board'" class="columns is-mobile is-centered is-gapless is-multiline box radius_05 fs_075">
@@ -336,7 +336,7 @@
           <div v-if="ls_pp.active_panel_sub === 'shop_set_panel'" class="column is-12">
             <div>
               SHOPリスト
-              <table class="table is-striped">
+              <table class="">
                 <thead>
                   <tr>
                     <td><i class="fa-solid fa-paw"></i></td>
@@ -359,7 +359,7 @@
               <button @click="ls_md.add_shop_list()" class="button is-link is-outlined is-small">追加+</button>
               <hr>
               非表示リスト
-              <table class="table is-striped">
+              <table class="">
                 <thead>
                   <tr>
                     <td><i class="fa-solid fa-paw"></i></td>
@@ -387,7 +387,7 @@
           <div v-if="ls_pp.active_panel_sub === 'maker_set_panel'" class="column is-12">
             <div>
               メーカーリスト
-              <table class="table is-striped">
+              <table class="">
                 <thead>
                   <tr>
                     <td><i class="fa-solid fa-paw"></i></td>
@@ -408,9 +408,11 @@
                 </tbody>
               </table>
               <button @click="ls_md.add_maker_list()" class="button is-link is-outlined is-small">追加+</button>
+              <!--*********************************************************************************************-->
               <hr>
+              <!--*********************************************************************************************-->
               非表示リスト
-              <table class="table is-striped">
+              <table class="">
                 <thead>
                   <tr>
                     <td><i class="fa-solid fa-paw"></i></td>
@@ -432,6 +434,14 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+          <!--*********************************************************************************************-->
+          <div v-if="ls_pp.active_panel_sub === 'arr_set_panel'" class="column is-12">
+            <div>
+              配列データ
+              <textarea class="textarea is-small">(% ls_pp %)</textarea>
+              <button @click="ls_md.delete_local_storage()" class="button is-link is-outlined is-small">データを削除する</button>
             </div>
           </div>
           <!--*********************************************************************************************-->
@@ -461,12 +471,23 @@
   import {
     createApp,
     ref,
-    nextTick
+    nextTick,
+    onBeforeMount,
+    onMounted,
+    onBeforeUpdate,
+    onUpdated,
+    onBeforeUnmount,
+    onUnmounted
   } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 
 
   createApp({
     setup() {
+      //
+      // ====================================================================================================
+      // ==[ LS_PP プロパティクラス ]=============================================================================
+      // ====================================================================================================
+      //
       const ls_pp = ref({
         active_panel_sub: "auto_convert_board",
         active_panel: {
@@ -487,7 +508,8 @@
             board: ["各種設定", "setting_board"],
             sub: [
               ["SHOPリスト", "shop_set_panel", "fa-solid fa-gear"],
-              ["メーカーリスト", "maker_set_panel", "fa-solid fa-gear"]
+              ["メーカーリスト", "maker_set_panel", "fa-solid fa-gear"],
+              ["データ閲覧削除", "arr_set_panel", "fa-solid fa-gear"]
             ]
           },
         ],
@@ -527,6 +549,7 @@ JAN
             descliption: "loremipsum loremipsum test text."
           }
         ],
+        maker_list_hidden: [],
         product_details: [{
           input_type: "text",
           outuput_type: "form",
@@ -550,11 +573,17 @@ JAN
           jans: ["1234567890123"],
         }]
       })
-
+      //
+      // ====================================================================================================
+      // ==[ LS_MD メソッドクラス ]=============================================================================
+      // ====================================================================================================
+      //
       const ls_md = class {
-        // 
-        // 
         //
+        // 
+        // ==[ SET DETAIL ]==============================================================
+        //
+        // 
         static set_panel = (board_ind) => {
           ls_pp.value.active_panel = ls_pp.value.panel_list[board_ind]
           ls_pp.value.active_panel_sub = ls_pp.value.active_panel.sub[0][1]
@@ -562,9 +591,11 @@ JAN
         static set_panel_sub = (sub_ind) => {
           ls_pp.value.active_panel_sub = ls_pp.value.active_panel.sub[sub_ind][1]
         }
-        // 
-        // 
         //
+        // 
+        // ==[ GET DETAIL ]==============================================================
+        //
+        // 
         static get_detail = (detail_ind) => {
           return ls_pp.value.product_details[detail_ind]
         }
@@ -582,7 +613,9 @@ JAN
         }
         //
         // 
+        // ==[ GET SHOP MAKER ]==============================================================
         //
+        // 
         static get_shop = (ind_num) => {
           return ls_pp.value.shop_list[ind_num]
         }
@@ -590,12 +623,16 @@ JAN
           return ls_pp.value.maker_list[ind_num]
         }
         //
+        // 
+        // ==[ GET OTHER ]==============================================================
+        //
+        // 
+        //
         // 後ろから５ケタを返す
         //
         static get_endfive = (str) => {
           return str.substr(-5, 5)
         }
-        //
         // 
         //
         static get_pr_code_maker = (detail, jan) => {
@@ -603,8 +640,12 @@ JAN
         }
         //
         // 
+        // ==[ ADD ]==============================================================
         //
-        static shop_detail_add = () => {
+        // 
+        // detailを追加する
+        // 
+        static add_shop_detail = () => {
           ls_pp.value.product_details.push({
             input_type: "text",
             outuput_type: "form",
@@ -632,16 +673,21 @@ JAN
           })
         }
         //
-        // 
+        // JAN の追加
         //
-        static jan_add = (detail_ind) => {
+        static add_jan = (detail_ind) => {
           ls_pp.value.product_details[detail_ind].jans.push("")
           nextTick(() => {
             this.init_tippy()
           })
         }
         //
-        // 90123 Z12345678-TEXT-90123
+        //
+        // ==[ CLIP BOARD COPY ]==============================================================
+        //
+        //
+        //
+        // クリップボードにコピー
         //
         static select_copy(e, elem_type) {
           e.target.focus();
@@ -651,14 +697,20 @@ JAN
           }
         }
         //
-        // 
+        //
+        // ==[ VIEW ]==============================================================
+        //
+        //
+        // 入力画面表示用の分岐用 input_type の制御
         //
         static set_input_type = (detail_ind, input_type) => {
           this.get_detail(detail_ind).input_type = input_type
         }
         //
         // 
+        // ==[ SPLIT JOIN ]==============================================================
         //
+        // 
         static split_lines = (target_str) => {
           // 改行コードで分割
           return target_str.split(/\r\n|\n/)
@@ -669,7 +721,11 @@ JAN
         }
         //
         // 
+        // ==[ SET FORM ➤ FREETEXT ]==============================================================
         //
+        // 
+        // ショップ情報を フォーム➤テキスト へ反映
+        // 
         static set_freetext_shop = (detail_ind) => {
           // detail_ind の配列の free_text を取得して改行コードで配列に変換
           let arr = this.split_lines(this.get_detail(detail_ind).free_text)
@@ -699,9 +755,9 @@ JAN
           // 改行コードを変換しなおして代入
           this.get_detail(detail_ind).free_text = this.join_lines(arr)
         }
-        //
         // 
-        //
+        // メーカー情報を フォーム➤テキスト へ反映
+        // 
         static set_freetext_maker = (detail_ind) => {
           // detail_ind の配列の free_text を取得して改行コードで配列に変換
           let arr = this.split_lines(this.get_detail(detail_ind).free_text)
@@ -731,9 +787,9 @@ JAN
           // 改行コードを変換しなおして代入
           this.get_detail(detail_ind).free_text = this.join_lines(arr)
         }
-        //
         // 
-        //
+        // 自社コードを フォーム➤テキスト へ反映
+        // 
         static set_freetext_pr_code = (detail_ind) => {
           // detail_ind の配列の free_text を取得して改行コードで配列に変換
           let arr = this.split_lines(this.get_detail(detail_ind).free_text)
@@ -751,9 +807,9 @@ JAN
           // 改行コードを変換しなおして代入
           this.get_detail(detail_ind).free_text = this.join_lines(arr)
         }
-        //
         // 
-        //
+        // JANコードを フォーム➤テキスト へ反映
+        // 
         static set_freetext_jans = (detail_ind) => {
           // detail_ind の配列の free_text を取得して改行コードで配列に変換
           let arr = this.split_lines(this.get_detail(detail_ind).free_text)
@@ -779,7 +835,12 @@ JAN
         }
         //
         // 
+        // ==[ SET FREETEXT ➤ FORM ]==============================================================
         //
+        // 
+        // 
+        // JANコードを テキスト➤フォーム へ反映
+        // 
         static set_detail_freetext = (detail_ind) => {
           // detail_ind の配列の free_text を取得して改行コードで配列に変換
           let arr = this.split_lines(this.get_detail(detail_ind).free_text)
@@ -793,11 +854,9 @@ JAN
             jans: arr.indexOf("＝＞JAN"),
             end: arr.indexOf("-----＜＝"),
           }
-
           // 
           // 自社コード
           ls_pp.value.product_details[detail_ind].pr_code = arr[inds.pr_code + 1]
-
           // 
           // JAN
           const free_jans = []
@@ -824,6 +883,11 @@ JAN
           // 改行コードを変換しなおして代入
           this.get_detail(detail_ind).free_text = this.join_lines(arr)
         }
+        //
+        // 
+        // ==[ Tippy js ]==============================================================
+        //
+        // 
         // 
         // tippy js のツールチップを展開
         // 
@@ -843,6 +907,8 @@ JAN
             }
           })
         }
+        //
+        // 
         // ==[ SETTING ]==============================================================
         //
         // 
@@ -874,41 +940,163 @@ JAN
           // 削除
           ls_pp.value.shop_list_hidden.splice(shop_ind, 1)
         }
-
-
-      }
-
-
-      return {
-        ls_pp,
-        ls_md
-      }
-    },
-    mounted() {
-      window.onload = () => {
-
+        //
         // 
-        // tippy js のツールチップを展開
-        // 
-        const init_tippy = () => {
+        // 追加
+        static add_maker_list = () => {
           // 改行コードで分割
-          tippy(".tippy_copied", {
-            content: '<spna class="fs_075"><i class="fa-solid fa-dog"></i>＜コピーしました！</span>',
-            trigger: "click",
-            placement: "left",
-            arrow: true,
-            allowHTML: true,
-            offset: [0, 0],
-            onShow(instance) {
-              setTimeout(() => {
-                instance.hide()
-              }, 600)
+          ls_pp.value.maker_list.push({
+            text: "🐕",
+            code: "🐕",
+            descliption: "🐕"
+          })
+        }
+        // 非表示
+        static move_maker_list_hidden = (maker_ind) => {
+          // hiddenn に追加
+          ls_pp.value.maker_list_hidden.push(ls_pp.value.maker_list[maker_ind])
+          // 削除
+          ls_pp.value.maker_list.splice(maker_ind, 1)
+        }
+        // 表示
+        static move_maker_list_show = (maker_ind) => {
+          // hiddenn に追加
+          ls_pp.value.maker_list.push(ls_pp.value.maker_list_hidden[maker_ind])
+          // 削除
+          ls_pp.value.maker_list_hidden.splice(maker_ind, 1)
+        }
+        // 削除
+        static remove_hop_list_hidden = (maker_ind) => {
+          // 削除
+          ls_pp.value.maker_list_hidden.splice(maker_ind, 1)
+        }
+        //
+        // 
+        // ==[ LOCAL STORAGE 保存、取得、削除処理 ]==============================================================
+        //
+        // 
+        static insert_local_storage = () => {
+          // ローカルストレージに保存
+          const arr = ls_pp.value
+          // 暗号化して保存 
+          crypto_md.encrypt_rtn("N7kHTemQ", "e8TpP4k9N7kHTemQbH9rEkFVjD4RMcSzR7pk", arr)
+          // メインのjsファイルで以下のコードを記述して、インストールされている拡張機能のリストを取得します
+        }
+        static select_local_storage = () => {
+          // ローカルストレージから取得
+          crypto_md.decrypt_rtn("N7kHTemQ", "e8TpP4k9N7kHTemQbH9rEkFVjD4RMcSzR7pk", (arr) => {
+            console.log(arr)
+            if (arr !== null) {
+              ls_pp.value = arr
             }
           })
         }
-        init_tippy()
+        static delete_local_storage = () => {
+          const result = confirm("本当に削除してよろしいですか？")
+          if (result) {
+            localStorage.removeItem('N7kHTemQ')
+            // reloadメソッドによりページをリロード
+            window.location.reload();
+          }
+        }
+      }
+      //
+      // ====================================================================================================
+      // ==[ CRYPTO 暗号化＆LOCAL STORAGE 保存 ]==============================================================
+      // ====================================================================================================
+      // 
+      const crypto_md = class {
+        static encrypt = async (key, data) => {
+          const iv = crypto.getRandomValues(new Uint8Array(16))
+          const result = await crypto.subtle.encrypt({
+              name: "AES-CBC",
+              iv,
+            },
+            key,
+            data
+          )
+          return new Uint8Array([...iv, ...new Uint8Array(result)])
+        }
 
+        static decrypt = async (key, cipher) => {
+          const iv = cipher.slice(0, 16)
+          const data = cipher.slice(16)
+          const result = await crypto.subtle.decrypt({
+              name: "AES-CBC",
+              iv,
+            },
+            key,
+            data
+          )
+          return new Uint8Array(result)
+        }
 
+        static encodeText = text => new TextEncoder().encode(text)
+        static decodeText = text => new TextDecoder().decode(text)
+
+        static passphraseToKey = async passphrase => {
+          const pass256 = await crypto.subtle.digest({
+              name: "SHA-256"
+            },
+            this.encodeText(passphrase)
+          )
+          const key = await crypto.subtle.importKey(
+            "raw",
+            pass256, {
+              name: "AES-CBC",
+              length: 256,
+            },
+            false,
+            ["encrypt", "decrypt"]
+          )
+          return key
+        }
+
+        static encrypt_rtn = async (local_key, pass, arr) => {
+          const key = await this.passphraseToKey(pass)
+          const text = JSON.stringify(arr)
+          const bin = this.encodeText(text)
+          const encrypted = await this.encrypt(key, bin)
+          // 保存
+          localStorage.setItem(local_key, encrypted)
+        }
+
+        static decrypt_rtn = async (local_key, pass, func) => {
+          const key = await this.passphraseToKey(pass)
+          // 取得 空ならnullで実行してリターン
+          if (!localStorage.getItem(local_key)) {
+            func(null)
+            return;
+          }
+          const encrypted = Uint8Array.from(localStorage.getItem(local_key).split(","))
+          const decrypted = await this.decrypt(key, encrypted)
+          func(JSON.parse(this.decodeText(decrypted)))
+        }
+      }
+      //
+      // ====================================================================================================
+      // ==[ onMounted ]==============================================================
+      // ====================================================================================================
+      // 
+      onMounted(() => {
+        window.onload = () => {
+          ls_md.init_tippy()
+          ls_md.select_local_storage()
+        }
+      })
+      //
+      // ====================================================================================================
+      // ==[ onUpdated ]==============================================================
+      // ====================================================================================================
+      // 
+      onUpdated(() => {
+        ls_md.insert_local_storage()
+      })
+
+      return {
+        ls_pp,
+        ls_md,
+        crypto_md
       }
     },
     delimiters: ['(%', '%)']
