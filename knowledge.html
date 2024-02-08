@@ -1,0 +1,305 @@
+<head>
+  <title>
+    システム関連ナレッジ | 業務ツール
+  </title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="{{ asset('/css/bulma-docs.min.css') }}">
+
+  <script src="https://kit.fontawesome.com/8061408f79.js" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Firefox, Opera, Safari */
+    @font-face {
+      font-family: mplus-1p-light;
+      src: url("font/MPLUS1-VariableFont_wght.ttf") format("truetype")
+    }
+
+    /***********/
+    /**[ bulma ]**/
+    /***********/
+    .tag {
+      user-select: none;
+    }
+
+    .field {
+      margin-bottom: 0 !important;
+    }
+
+    .field-label {
+      margin-right: 0.5rem !important;
+    }
+
+    /*********************************************/
+
+    /***********/
+    /**[ xy  ]**/
+    /***********/
+    .y_3 {
+      width: 3rem !important;
+    }
+
+    /***********/
+    /**[ bd  ]**/
+    /***********/
+    .radius_05 {
+      border-radius: .5rem !important;
+    }
+
+    /***********/
+    /**[  f  ]**/
+    /***********/
+    .fs_09 {
+      font-size: .9rem !important;
+    }
+
+    .fs_075 {
+      font-size: .75rem !important;
+    }
+
+    .fs_05 {
+      font-size: .5rem !important;
+    }
+
+    .fs_03 {
+      font-size: .3rem !important;
+    }
+
+    .fc_red {
+      color: red;
+    }
+
+    .ff_mplus {
+      font-family: 'mplus-1p-light', 'sans-serif';
+    }
+
+    /***********/
+    /**[ cur ]**/
+    /***********/
+    .cur_poi {
+      cursor: pointer !important;
+    }
+
+    /***********/
+    /**[  m  ]**/
+    /***********/
+    .m_02 {
+      margin: .2rem !important;
+    }
+
+    .m_02_04 {
+      margin: .2rem .4rem !important;
+    }
+
+    .mx_02 {
+      margin-top: .2rem !important;
+      margin-bottom: .2rem !important;
+    }
+
+    .mr_02 {
+      margin-right: .2rem !important;
+    }
+
+    /***********/
+    /**[  m  ]**/
+    /***********/
+    .p_02 {
+      padding: .2rem !important;
+    }
+  </style>
+</head>
+<!--*********************************************************************************************-->
+
+<body class=" dark:bg-slate-800 dark:text-slate-100">
+  <!--*********************************************************************************************-->
+  <div id="app" class="ff_mplus">
+    <div class="columns">
+      <!--*********************************************************************************************-->
+      <div class="column is-3">
+        <nav class="panel">
+          <p class="panel-heading">
+            機能
+          </p>
+          <div class="panel-block">
+            <p class="control has-icons-left">
+              <input class="input" type="text" placeholder="Search">
+              <span class="icon is-left">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
+            </p>
+          </div>
+          <a v-for="(know, know_ind) in ls_pp.knowledges" @click="ls_md.set_active_knowledge(know_ind)" class="panel-block">
+            <span class="tag">(% know.id %)</span>
+            <span class="fs_09">(% know.title %)</span>
+          </a>
+        </nav>
+      </div>
+      <!--*********************************************************************************************-->
+      <div class="column is-9">
+        <div class="content">
+          <hr>
+          <h1>ナレッジ</h1>
+          <p></p>
+          <div>
+            <hr>
+            <h4 class="box">
+              <span class="tag">ナレッジID:(% ls_pp.knowledges[ls_pp.active_knowledge].id %)</span>
+              (% ls_pp.knowledges[ls_pp.active_knowledge].title %)
+            </h4>
+            <div v-for="(text, text_ind) in ls_pp.knowledges[ls_pp.active_knowledge].text">
+              <label class="label">(% text.theme %)</label>
+              <div class="notification" style="white-space: pre-wrap;">(% text.description %)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--*********************************************************************************************-->
+    </div>
+  </div>
+  <!--*********************************************************************************************-->
+</body>
+<script>
+  /*
+  tippy("", {
+    content: "test"
+  })
+  */
+</script>
+<script type="module">
+  import {
+    createApp,
+    ref,
+    nextTick,
+    onBeforeMount,
+    onMounted,
+    onBeforeUpdate,
+    onUpdated,
+    onBeforeUnmount,
+    onUnmounted
+  } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+
+  createApp({
+    setup() {
+      //
+      // ====================================================================================================
+      // ==[ LS_PP プロパティクラス ]=============================================================================
+      // ====================================================================================================
+      //
+      const ls_pp = ref({
+        active_knowledge: 0,
+        knowledges: [
+          {
+            id: "01",
+            title: "セキュリティアプリを入れたor変えたor操作した直後からPCが重い",
+            text: [
+              {
+                theme: "①まずは軽くする作業をするためにタスクを消す",
+                description: `ctrl + alt + deleteを押してタスクマネージャーを起動
+WindowsとかPCの機能っぽいもの以外を右クリック、タスクの終了を押す。
+ソフトはPCを再起動すれば勝手に起動するので、怖がらずにどんどん消しましょう。
+`
+              },
+              {
+                theme: "②アプリを削除する",
+                description: `タスクバー（PCの下の部分）の検索ボックスで「kon」と入力すると
+コントロールパネルのアプリが検索結果に表示されますので押します。
+プログラムのアンインストールを押します。
+セキュリティソフトが複数入っている場合は、1つだけ残して
+後は削除しましょう！（削除してよいか不明の場合はメーカーに問合せ）
+`
+              },
+              {
+                theme: "③勝手に動き出すアプリを止める",
+                description: `タスクバー（PCの下の部分）の検索ボックスで「たす」と入力すると
+タスクスケージューラーのアプリが検索結果に表示されますので押します。
+左側の「タスク スケジューラー ライブラリ」を押します。
+真ん中のボックスに色々出てきます。ここでいらないものを右クリック。
+「無効」を押します。
+Q：いらないものかわからない。。。例えばEdgeを使っていないなら
+「MicrosoftEdgeUpdateTaskMachineCore」のようなものはいらない。
+のような判断をしていきましょう。
+`
+              },
+              {
+                theme: "④PCの画面上の動きを抑えて軽くしよう",
+                description: `１．設定➤個人用設定➤色➤「透明効果」をオフ
+２．タスクバー（PCの下の部分）の検索ボックスで「システムの」と入力すると
+　　「システムの詳細設定」が検索結果に表示されますので押します。
+　　詳細設定➤パフォーマンス➤設定➤「カスタム」を押します。
+　　下のチェックボックスでいらなそうなもののチェックを外しましょう。
+　　Q：いらなそうかわからない。。。影やアニメーションはなくても
+　　　 操作に影響がなかったりします。試しにチェックを外して操作してみましょう。
+`
+              },
+            ],
+          },
+          {
+            id: "02",
+            title: "「Wolf Security Update Service」がアンインストールできない",
+            text: [
+              {
+                theme: "①HPの公式ナレッジを確認しましょう",
+                description: `以下サイトから確認ができます。
+https://jp.ext.hp.com/v-ivr/common/software/faq/06/
+「HP Wolf Security をアンインストールする方法」のタブを開いて
+内容に従って削除をためしてみましょう。
+`
+              },
+              {
+                theme: "②それでも削除ができない場合",
+                description: `同じサイトの
+「アンインストール時に「他のバージョンがインストールされている」とエラーが表示される場合」の
+タブを開いて「Microsoft のトラブルシューティングツールを使用してアンインストールする方法」のタブを開きます。
+内容に従って削除をためしてみましょう。
+`
+              },
+            ],
+          }]
+      })
+      //
+      // ====================================================================================================
+      // ==[ LS_MD メソッドクラス ]=============================================================================
+      // ====================================================================================================
+      //
+      const ls_md = class {
+        //
+        // 
+        // ==[ SET DETAIL ]==============================================================
+        //
+        // 
+        static set_active_knowledge = (know_ind) => {
+          ls_pp.value.active_knowledge = know_ind
+        }
+
+      }
+      //
+      // ====================================================================================================
+      // ==[ onMounted ]==============================================================
+      // ====================================================================================================
+      // 
+      onMounted(() => {
+        window.onload = () => {
+        }
+      })
+      //
+      // ====================================================================================================
+      // ==[ onUpdated ]==============================================================
+      // ====================================================================================================
+      // 
+      onUpdated(() => {
+
+      })
+
+      return {
+        ls_pp,
+        ls_md,
+      }
+    },
+    delimiters: ['(%', '%)']
+  }).mount('#app')
+</script>
