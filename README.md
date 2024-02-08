@@ -3,6 +3,7 @@ https://solutions.vaio.com/2154#s1
 
 nanowise dark
 
+vue3 snippet
 indent rainbow
 rename tag
 
