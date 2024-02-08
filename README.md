@@ -1,6 +1,8 @@
 ```
 https://solutions.vaio.com/2154#s1
 
+nanowise dark
+
 indent rainbow
 rename tag
 
