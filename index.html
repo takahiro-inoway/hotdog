@@ -10,6 +10,8 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" />
+
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
@@ -35,13 +37,6 @@
     }
 
     /*********************************************/
-
-    /***********/
-    /**[ xy  ]**/
-    /***********/
-    .y_3 {
-      width: 3rem !important;
-    }
 
     /***********/
     /**[ bd  ]**/
@@ -78,6 +73,25 @@
     /***********/
     .cur_poi {
       cursor: pointer !important;
+    }
+
+    /***********/
+    /**[ xy  ]**/
+    /***********/
+    .y_3 {
+      width: 3rem !important;
+    }
+
+    .y_4 {
+      width: 4rem !important;
+    }
+
+    .y_max50 {
+      max-width: 50rem !important;
+    }
+
+    .y_min45 {
+      min-width: 45rem !important;
     }
 
     /***********/
@@ -131,421 +145,399 @@
             </span>
             (% sub[0] %)
           </a>
+          <a href="https://takahiro-inoway.github.io/hotdog/knowledge.html" v-if="ls_pp.active_panel.board[1] === 'tool_board'" class="panel-block">
+            <span class="panel-icon">
+              <i class="fas fa-book" aria-hidden="true"></i>
+            </span>
+            ナレッジ
+          </a>
         </article>
       </div>
       <!--*********************************************************************************************-->
       <div v-if="ls_pp.active_panel.board[1] === 'tool_board'" class="column is-10">
-        <div v-if="ls_pp.active_panel_sub === 'auto_convert_board'">
-          <div v-for="(detail, detail_ind) in ls_pp.product_details" class="columns is-mobile is-centered is-gapless is-multiline box radius_05 fs_075">
-            <!--*********************************************************************************************-->
-            <div class="column is-5">
-              <div class="">
-                <!--*********************************************************************************************-->
-                <div class="field">
-                  <label class="label">自動生成</label>
-                  <hr>
+        <div v-if="ls_pp.active_panel_sub === 'auto_convert_board'" class="columns is-multiline">
+          <div v-for="(detail, detail_ind) in ls_pp.product_details" class="column is-12-mobile is-6-desktop y_max50 y_min45">
+            <div class="columns is-mobile is-centered is-gapless is-multiline box radius_05 fs_075">
+              <!--*********************************************************************************************-->
+              <div class="column is-5">
+                <div class="">
                   <!--*********************************************************************************************-->
-                  <div class="columns is-centered">
-                    <div class="column is-8 p_02">
-                      <!--*********************************************************************************************-->
-                      <table>
-                        <tr>
-                          <td><label class="label fs_075">管理番号</label></td>
-                          <td>
-                            <span @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied m_02">
-                              (% detail.pr_code %)
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td><label class="label fs_075">自社コード</label></td>
-                          <td>
-                            <span @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied m_02">
-                              (% ls_md.get_detail_shop(detail_ind).code %)(% detail.pr_code %)
-                            </span>
-                          </td>
-                        </tr>
-                      </table>
-                      <!--*********************************************************************************************-->
-                    </div>
+                  <div class="field">
+                    <label class="label">自動生成</label>
+                    <hr>
                     <!--*********************************************************************************************-->
-                    <div class="column is-4 p_02">
+                    <div class="columns is-centered">
+                      <div class="column is-8 p_02">
+                        <!--*********************************************************************************************-->
+                        <table>
+                          <tr>
+                            <td><label class="label fs_075">管理番号</label></td>
+                            <td>
+                              <span @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied m_02">
+                                (% detail.product_code %)
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><label class="label fs_075">自社コード</label></td>
+                            <td>
+                              <span @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied m_02">
+                                (% ls_md.get_detail_shop(detail_ind).code %)(% detail.product_code %)
+                              </span>
+                            </td>
+                          </tr>
+                        </table>
+                        <!--*********************************************************************************************-->
+                      </div>
+                      <!--*********************************************************************************************-->
+                      <div class="column is-4 p_02">
 
+                      </div>
+                      <!--*********************************************************************************************-->
                     </div>
                     <!--*********************************************************************************************-->
+                    <hr>
+                    <!--*********************************************************************************************-->
+                    <div class="columns is-centered">
+                      <!--*********************************************************************************************-->
+                      <div class="column is-6 p_02">
+                        <!--*********************************************************************************************-->
+                        <div class="control">
+                          <label class="label">JAN</label>
+                          <div class="control">
+                            <div v-for="(jan, ind) in detail.jans">
+                              <span v-if="jan !== ''" @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied m_02">
+                                (% jan %)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <!--*********************************************************************************************-->
+                        <div class="control">
+                          <label class="label">品番</label>
+                          <div class="control">
+                            <div v-for="(jan, ind) in detail.jans">
+                              <span v-if="jan !== ''" @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied m_02">
+                                (% ls_md.get_detail_maker(detail_ind).code %)-(% ls_md.get_endfive(jan) %)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <!--*********************************************************************************************-->
+                      </div>
+                      <!--*********************************************************************************************-->
+                      <div class="column is-6 p_02">
+                        <!--*********************************************************************************************-->
+                        <div class="control">
+                          <label class="label">JAN末尾5桁ー品番</label>
+                          <div class="control">
+                            <div v-for="(jan, ind) in detail.jans">
+                              <span v-if="jan !== ''" @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied m_02">
+                                (% ls_md.get_endfive(jan) %)
+                                </sp>
+                            </div>
+                          </div>
+                        </div>
+                        <!--*********************************************************************************************-->
+                      </div>
+                      <!--*********************************************************************************************-->
+                    </div>
                   </div>
                   <!--*********************************************************************************************-->
-                  <hr>
-                  <!--*********************************************************************************************-->
-                  <div class="columns is-centered">
-                    <!--*********************************************************************************************-->
-                    <div class="column is-6 p_02">
-                      <!--*********************************************************************************************-->
-                      <div class="control">
-                        <label class="label">JAN</label>
-                        <div class="control">
-                          <div v-for="(jan, ind) in detail.jans">
-                            <span v-if="jan !== ''" @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied">
-                              (% jan %)
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <!--*********************************************************************************************-->
-                      <div class="control">
-                        <label class="label">品番</label>
-                        <div class="control">
-                          <div v-for="(jan, ind) in detail.jans">
-                            <span v-if="jan !== ''" @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied">
-                              (% ls_md.get_detail_maker(detail_ind).code %)-(% ls_md.get_endfive(jan) %)
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <!--*********************************************************************************************-->
-                    </div>
-                    <!--*********************************************************************************************-->
-                    <div class="column is-6 p_02">
-                      <!--*********************************************************************************************-->
-                      <div class="control">
-                        <label class="label">JAN末尾5桁ー品番</label>
-                        <div class="control">
-                          <div v-for="(jan, ind) in detail.jans">
-                            <span v-if="jan !== ''" @click="ls_md.select_copy($event, 'inner')" class="tag cur_poi tippy_copied">
-                              (% ls_md.get_endfive(jan) %)
-                              </sp>
-                          </div>
-                        </div>
-                      </div>
-                      <!--*********************************************************************************************-->
-                    </div>
-                    <!--*********************************************************************************************-->
-                  </div>
                 </div>
-                <!--*********************************************************************************************-->
               </div>
-            </div>
-            <!--*********************************************************************************************-->
-            <div class="column is-1">|</div>
-            <!--*********************************************************************************************-->
-            <div class="column is-6">
-              <div class="">
-                <!--*********************************************************************************************-->
-                <div class="field is-horizontal">
-                  <div class="field-label is-normal">
-                    <label class="label">SHOP</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field is-narrow">
-                      <div class="control">
-                        <div class="select is-fullwidth is-small">
-                          <select @change="ls_md.set_freetext_shop(detail_ind)" v-model="detail.shop_ind">
-                            <option v-for="(shop, ind) in ls_pp.shop_list" :value="ind">(% shop.text %)</option>
-                          </select>
-                        </div>
+              <!--*********************************************************************************************-->
+              <div class="column is-1">|</div>
+              <!--*********************************************************************************************-->
+              <div class="column is-6 notification">
+                <table class="fs_075">
+                  <!--*********************************************************************************************-->
+                  <tr>
+                    <td>-------------</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>SHOP</td>
+                    <td>
+                      <div class="select is-fullwidth is-small">
+                        <select class="select" @change="ls_md.set_freetext_shop(detail_ind)" v-model="detail.shop_ind">
+                          <option v-for="(shop, ind) in ls_pp.shop_list" :value="ind">(% shop.text %)</option>
+                        </select>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <!--*********************************************************************************************-->
-                <div class="field is-horizontal">
-                  <div class="field-label is-normal">
-                    <label class="label">メーカー</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field is-narrow">
-                      <div class="control">
-                        <div class="select is-fullwidth is-small">
-                          <select @change="ls_md.set_freetext_maker(detail_ind)" v-model="detail.maker_ind">
-                            <option v-for="(maker, ind) in ls_pp.maker_list" :value="ind">(% maker.text %)</option>
-                          </select>
-                        </div>
+                    </td>
+                  </tr>
+                  <!--*********************************************************************************************-->
+                  <tr>
+                    <td>メーカー</td>
+                    <td>
+                      <div class="select is-fullwidth is-small">
+                        <select @change="ls_md.set_freetext_maker(detail_ind)" v-model="detail.maker_ind">
+                          <option v-for="(maker, ind) in ls_pp.maker_list" :value="ind">(% maker.text %)</option>
+                        </select>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <!--*********************************************************************************************-->
-                <!--
-                <div class="field">
-                  <button @click="ls_md.set_input_type(detail_ind, 'text')" :class="[detail.input_type === 'text' ? 'button is-small is-link' : 'button is-small is-link is-outlined']">自由入力形式</button>
-                  <button @click="ls_md.set_input_type(detail_ind, 'form')" :class="[detail.input_type === 'form' ? 'button is-small is-link' : 'button is-small is-link is-outlined']">フォーム形式</button>
-                </div>
-                -->
-                <!--*********************************************************************************************-->
-                <div v-if="detail.input_type === 'text'" class="field">
-                  <label class="label fs_075">自由入力形式</label>
-                  <span>※＝＞項目名＋改行＋内容、の形式で記入すると自動判定します！</span>
-                  <div class="control">
-                    <textarea @input="ls_md.set_detail_freetext(detail_ind)" v-model="detail.free_text" class="textarea is-small" :placeholder="ls_pp.freetext_placeholder" rows="10"></textarea>
-                  </div>
-                </div>
-                <!--*********************************************************************************************-->
-                <div class="field is-horizontal">
-                  <div class="field-label is-normal">
-                    <label class="label">自社ｺｰﾄﾞ</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field">
-                      <div>
-                        <div class="control has-icons-right">
-                          <input @input="ls_md.set_freetext_pr_code(detail_ind)" v-model="detail.pr_code" :class="[detail.pr_code.length < 8 ? 'input is-small is-danger' : 'input is-small']" placeholder="8桁" type="text">
-                          <span class="icon is-right m_02 y_3">
-                            <i :class="[detail.pr_code.length < 8 ? 'fc_red' : '']">(% detail.pr_code.length %)<span class="fs_03">ケタ</span></i>
-                          </span>
-                        </div>
+                    </td>
+                  </tr>
+                  <!--*********************************************************************************************-->
+                  <tr>
+                    <td>管理番号</td>
+                    <td>
+                      <div class="control has-icons-right">
+                        <input @input="ls_md.set_freetext_product_code(detail_ind)" v-model="detail.product_code" :class="[detail.product_code.length < 8 ? 'input is-small is-danger' : 'input is-small']" placeholder="8桁" type="text">
+                        <span class="icon is-right m_02 y_3">
+                          <i :class="[detail.product_code.length < 8 ? 'fc_red' : '']">(% detail.product_code.length %)<span class="fs_03">ケタ</span></i>
+                        </span>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <!--*********************************************************************************************-->
-                <hr>
-                <!--*********************************************************************************************-->
-                <div class="field is-horizontal mx_02">
-                  <div class="field-label is-normal">
-                    <label class="label">JAN</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field">
+                    </td>
+                  </tr>
+                  <!--*********************************************************************************************-->
+                  <tr>
+                    <td>JAN<i class="fas fa-solid fa-barcode"></i></td>
+                    <td>
                       <table>
-                        (% detail.jans %)
-                        <tr v-for="(jan, ind) in detail.jans">
+                        <tr v-for="(jan, jan_ind) in detail.jans">
                           <td>
                             <span @click="" class="tag cur_poi m_02">
                               <i class="fa-solid fa-bars"></i>
                             </span>
                           </td>
-                          <td class="control has-icons-left has-icons-right">
-                            <input @input="ls_md.set_freetext_jans(detail_ind)" v-model="detail.jans[ind]" type="text" :class="[jan.length < 8 ? 'input is-small is-danger' : 'input is-small']" maxlength="15" placeholder="JANを入力">
-                            <span class="icon is-left m_02">
-                              <i class="fas fa-solid fa-barcode"></i>
-                            </span>
-                            <span class="icon is-right m_02 y_3">
+                          <td class="control has-icons-right">
+                            <input @input="ls_md.set_freetext_jans(detail_ind)" v-model="detail.jans[jan_ind]" type="text" :class="[jan.length < 8 ? 'input is-small is-danger' : 'input is-small']" maxlength="15" placeholder="JANを入力">
+                            <span class="icon is-right m_02 y_4">
                               <i :class="[jan.length < 8 ? 'm_02_04 fc_red' : 'm_02_04']">(% jan.length %)<span class="fs_03">ケタ</span></i>
                             </span>
                           </td>
                           <td>
-                            <span @click="" class="tag cur_poi m_02">
+                            <span @click="ls_md.hidden_jan(detail_ind, jan_ind)" class="tag cur_poi m_02">
                               <i class="fa-solid fa-trash mr_02"></i>削除
                             </span>
                           </td>
                         </tr>
                       </table>
-                      <button @click="ls_md.add_jan(detail_ind)" class="button is-link is-outlined is-small">Add+</button>
-                    </div>
-                  </div>
-                </div>
-                <!--*********************************************************************************************-->
-                <div v-if="detail.input_type === 'form'" class="field is-horizontal mx_02">
-                  <div class="field-label">
-                    <label class="label">品番は？</label>
-                  </div>
-                  <div class="field-body">
-                    <div class="field is-narrow">
-                      <div class="control">
-                        <label class="radio">
-                          <input type="radio" name="member">
-                          ある！
-                        </label>
-                        <label class="radio">
-                          <input type="radio" name="member">
-                          ない！ので新しく作る
-                        </label>
+                      <button @click="ls_md.add_jan(detail_ind)" class="button is-link is-outlined is-small m_02">追加+</button>
+                      <button @click="" class="button is-link is-outlined is-small m_02">JAN履歴</button>
+                    </td>
+                  </tr>
+                  <!--*********************************************************************************************-->
+                  <tr>
+                    <td>品番</td>
+                    <td>
+                      <div class="field is-narrow">
+                        <div class="control">
+                          <label class="radio">
+                            <input type="radio" name="member">
+                            ある！
+                          </label>
+                          <label class="radio">
+                            <input type="radio" name="member">
+                            ない！ので新しく作る
+                          </label>
+                        </div>
                       </div>
+                    </td>
+                  </tr>
+                  <!--*********************************************************************************************-->
+                  <div v-if="1 === 0" class="field">
+                    <label class="label fs_075">自由入力形式</label>
+                    <span>※＝＞項目名＋改行＋内容、の形式で記入すると自動判定します！</span>
+                    <div class="control">
+                      <textarea @input="ls_md.set_detail_freetext(detail_ind)" v-model="detail.free_text" class="textarea is-small" :placeholder="ls_pp.freetext_placeholder" rows="10"></textarea>
                     </div>
                   </div>
-                </div>
-                <!--*********************************************************************************************-->
+                  <!--*********************************************************************************************-->
+                </table>
               </div>
             </div>
             <!--*********************************************************************************************-->
           </div>
-          <div class="">
-            <button @click="ls_md.add_shop_detail()" class="button is-link is-outlined is-small">Add+</button>
-          </div>
-        </div>
-        <div v-if="ls_pp.active_panel_sub === 'other_tool_board'" class="columns is-mobile is-centered is-gapless is-multiline box radius_05 fs_075">
-          その他
         </div>
       </div>
-      <!--*********************************************************************************************-->
-
-
-      <!--*********************************************************************************************-->
-      <div v-if="ls_pp.active_panel.board[1] === 'setting_board'" class="column is-10">
-        <div class="columns is-mobile is-centered is-gapless is-multiline box radius_05 fs_075">
-          <!--*********************************************************************************************-->
-          <div v-if="ls_pp.active_panel_sub === 'shop_set_panel'" class="column is-12">
-            <div>
-              SHOPリスト
-              <table class="">
-                <thead>
-                  <tr>
-                    <td><i class="fa-solid fa-paw"></i></td>
-                    <td>SHOP名</td>
-                    <td>コード</td>
-                    <td>説明</td>
-                    <td></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(shop, shop_ind) in ls_pp.shop_list">
-                    <td>
-                      <span @click="" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-bars"></i>
-                      </span>
-                    </td>
-                    <td><input v-model="shop.text" class="input is-small" type="input"></td>
-                    <td><input v-model="shop.code" class="input is-small" type="input"></td>
-                    <td><input v-model="shop.descliption" class="input is-small" type="input"></td>
-                    <td>
-                      <span @click="ls_md.move_shop_list_hidden(shop_ind)" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-circle-minus mr_02"></i>
-                        非表示にする
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <button @click="ls_md.add_shop_list()" class="button is-link is-outlined is-small">追加+</button>
-              <hr>
-              非表示リスト
-              <table class="">
-                <thead>
-                  <tr>
-                    <td><i class="fa-solid fa-paw"></i></td>
-                    <td>SHOP名</td>
-                    <td>コード</td>
-                    <td>説明</td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(shop, shop_ind) in ls_pp.shop_list_hidden">
-                    <td>
-                      <span @click="" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-bars"></i>
-                      </span>
-                    </td>
-                    <td><input v-model="shop.text" class="input is-small" type="input"></td>
-                    <td><input v-model="shop.code" class="input is-small" type="input"></td>
-                    <td><input v-model="shop.descliption" class="input is-small" type="input"></td>
-                    <td>
-                      <span @click="ls_md.remove_shop_list_hidden(shop_ind)" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-trash has-text-dark mr_02"></i>
-                        削除
-                      </span>
-                    </td>
-                    <td>
-                      <span @click="ls_md.move_shop_list_show(shop_ind)" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-arrow-up mr_02"></i>
-                        表示する
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <!--*********************************************************************************************-->
-          <div v-if="ls_pp.active_panel_sub === 'maker_set_panel'" class="column is-12">
-            <div>
-              メーカーリスト
-              <table class="">
-                <thead>
-                  <tr>
-                    <td><i class="fa-solid fa-paw"></i></td>
-                    <td>メーカー名</td>
-                    <td>コード</td>
-                    <td>説明</td>
-                    <td></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(maker, maker_ind) in ls_pp.maker_list">
-                    <td>
-                      <span @click="" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-bars"></i>
-                      </span>
-                    </td>
-                    <td><input v-model="maker.text" class="input is-small" type="input"></td>
-                    <td><input v-model="maker.code" class="input is-small" type="input"></td>
-                    <td><input v-model="maker.descliption" class="input is-small" type="input"></td>
-                    <td>
-                      <span @click="ls_md.move_maker_list_hidden(maker_ind)" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-circle-minus mr_02"></i>
-                        非表示にする
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <button @click="ls_md.add_maker_list()" class="button is-link is-outlined is-small">追加+</button>
-              <!--*********************************************************************************************-->
-              <hr>
-              <!--*********************************************************************************************-->
-              非表示リスト
-              <table class="">
-                <thead>
-                  <tr>
-                    <td><i class="fa-solid fa-paw"></i></td>
-                    <td>メーカー名</td>
-                    <td>コード</td>
-                    <td>説明</td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(maker, maker_ind) in ls_pp.maker_list_hidden">
-                    <td>
-                      <span @click="" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-bars"></i>
-                      </span>
-                    </td>
-                    <td><input v-model="maker.text" class="input is-small" type="input"></td>
-                    <td><input v-model="maker.code" class="input is-small" type="input"></td>
-                    <td><input v-model="maker.descliption" class="input is-small" type="input"></td>
-                    <td>
-                      <span @click="ls_md.remove_maker_list_hidden(maker_ind)" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-trash has-text-dark mr_02"></i>
-                        削除
-                      </span>
-                    </td>
-                    <td>
-                      <span @click="ls_md.move_maker_list_show(maker_ind)" class="tag cur_poi m_02">
-                        <i class="fa-solid fa-arrow-up mr_02"></i>
-                        表示する
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <!--*********************************************************************************************-->
-          <div v-if="ls_pp.active_panel_sub === 'arr_set_panel'" class="column is-12">
-            <div>
-              配列データ
-              <textarea class="textarea is-small">(% ls_pp %)</textarea>
-              <button @click="ls_md.delete_local_storage()" class="button is-link is-outlined is-small">データを削除する</button>
-            </div>
-          </div>
-          <!--*********************************************************************************************-->
-        </div>
+      <div class="">
+        <button @click="ls_md.add_shop_detail()" class="button is-link is-outlined is-small">Add+</button>
       </div>
-
-      <!--*********************************************************************************************-->
-
+      <div v-if="ls_pp.active_panel_sub === 'other_tool_board'" class="columns is-mobile is-centered is-gapless is-multiline box radius_05 fs_075">
+        その他
+        <button @click="ls_md.remove_blank_jan()">test</button>
+      </div>
     </div>
-
-
-
-
-
+    <!--*********************************************************************************************-->
 
 
     <!--*********************************************************************************************-->
+    <div v-if="ls_pp.active_panel.board[1] === 'setting_board'" class="column is-10">
+      <div class="columns is-mobile is-centered is-gapless is-multiline box radius_05 fs_075">
+        <!--*********************************************************************************************-->
+        <div v-if="ls_pp.active_panel_sub === 'shop_set_panel'" class="column is-12">
+          <div>
+            SHOPリスト
+            <table class="">
+              <thead>
+                <tr>
+                  <td><i class="fa-solid fa-paw"></i></td>
+                  <td>SHOP名</td>
+                  <td>コード</td>
+                  <td>説明</td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(shop, shop_ind) in ls_pp.shop_list">
+                  <td>
+                    <span @click="" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-bars"></i>
+                    </span>
+                  </td>
+                  <td><input v-model="shop.text" class="input is-small" type="input"></td>
+                  <td><input v-model="shop.code" class="input is-small" type="input"></td>
+                  <td><input v-model="shop.descliption" class="input is-small" type="input"></td>
+                  <td>
+                    <span @click="ls_md.move_shop_list_hidden(shop_ind)" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-circle-minus mr_02"></i>
+                      非表示にする
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button @click="ls_md.add_shop_list()" class="button is-link is-outlined is-small">追加+</button>
+            <hr>
+            非表示リスト
+            <table class="">
+              <thead>
+                <tr>
+                  <td><i class="fa-solid fa-paw"></i></td>
+                  <td>SHOP名</td>
+                  <td>コード</td>
+                  <td>説明</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(shop, shop_ind) in ls_pp.shop_list_hidden">
+                  <td>
+                    <span @click="" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-bars"></i>
+                    </span>
+                  </td>
+                  <td><input v-model="shop.text" class="input is-small" type="input"></td>
+                  <td><input v-model="shop.code" class="input is-small" type="input"></td>
+                  <td><input v-model="shop.descliption" class="input is-small" type="input"></td>
+                  <td>
+                    <span @click="ls_md.remove_shop_list_hidden(shop_ind)" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-trash has-text-dark mr_02"></i>
+                      削除
+                    </span>
+                  </td>
+                  <td>
+                    <span @click="ls_md.move_shop_list_show(shop_ind)" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-arrow-up mr_02"></i>
+                      表示する
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--*********************************************************************************************-->
+        <div v-if="ls_pp.active_panel_sub === 'maker_set_panel'" class="column is-12">
+          <div>
+            メーカーリスト
+            <table class="">
+              <thead>
+                <tr>
+                  <td><i class="fa-solid fa-paw"></i></td>
+                  <td>メーカー名</td>
+                  <td>コード</td>
+                  <td>説明</td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(maker, maker_ind) in ls_pp.maker_list">
+                  <td>
+                    <span @click="" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-bars"></i>
+                    </span>
+                  </td>
+                  <td><input v-model="maker.text" class="input is-small" type="input"></td>
+                  <td><input v-model="maker.code" class="input is-small" type="input"></td>
+                  <td><input v-model="maker.descliption" class="input is-small" type="input"></td>
+                  <td>
+                    <span @click="ls_md.move_maker_list_hidden(maker_ind)" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-circle-minus mr_02"></i>
+                      非表示にする
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button @click="ls_md.add_maker_list()" class="button is-link is-outlined is-small">追加+</button>
+            <!--*********************************************************************************************-->
+            <hr>
+            <!--*********************************************************************************************-->
+            非表示リスト
+            <table class="">
+              <thead>
+                <tr>
+                  <td><i class="fa-solid fa-paw"></i></td>
+                  <td>メーカー名</td>
+                  <td>コード</td>
+                  <td>説明</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(maker, maker_ind) in ls_pp.maker_list_hidden">
+                  <td>
+                    <span @click="" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-bars"></i>
+                    </span>
+                  </td>
+                  <td><input v-model="maker.text" class="input is-small" type="input"></td>
+                  <td><input v-model="maker.code" class="input is-small" type="input"></td>
+                  <td><input v-model="maker.descliption" class="input is-small" type="input"></td>
+                  <td>
+                    <span @click="ls_md.remove_maker_list_hidden(maker_ind)" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-trash has-text-dark mr_02"></i>
+                      削除
+                    </span>
+                  </td>
+                  <td>
+                    <span @click="ls_md.move_maker_list_show(maker_ind)" class="tag cur_poi m_02">
+                      <i class="fa-solid fa-arrow-up mr_02"></i>
+                      表示する
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--*********************************************************************************************-->
+        <div v-if="ls_pp.active_panel_sub === 'arr_set_panel'" class="column is-12">
+          <div>
+            配列データ
+            <textarea class="textarea is-small">(% ls_pp %)</textarea>
+            <button @click="ls_md.delete_local_storage()" class="button is-link is-outlined is-small">データを削除する</button>
+          </div>
+        </div>
+        <!--*********************************************************************************************-->
+      </div>
+    </div>
+
+    <!--*********************************************************************************************-->
+
+  </div>
+
+
+
+
+
+
+
+  <!--*********************************************************************************************-->
   </div>
   <!--*********************************************************************************************-->
 </body>
@@ -614,16 +606,10 @@ JAN
 1234567890123
 `,
         shop_list: [{
-            text: "パサージュメンズ",
-            code: "Z",
-            descliption: "loremipsum loremipsum test text."
-          },
-          {
-            text: "テスト",
-            code: "T",
-            descliption: "loremipsum loremipsum test text."
-          }
-        ],
+          text: "テスト",
+          code: "T",
+          descliption: "loremipsum loremipsum test text."
+        }],
         shop_list_hidden: [],
         maker_list: [{
             text: "testtext",
@@ -654,10 +640,12 @@ JAN
 ＝＞JAN
 
 -----＜＝`,
-          pr_code: "12345678",
+          product_name: "",
+          product_code: "12345678",
           shop_ind: 0,
           maker_ind: 0,
           jans: ["1234567890123"],
+          hidden_jans: [],
         }]
       })
       //
@@ -692,8 +680,8 @@ JAN
         static get_detail_maker = (detail_ind) => {
           return this.get_maker(this.get_detail(detail_ind).maker_ind)
         }
-        static get_detail_pr_code = (detail_ind) => {
-          return this.get_detail(detail_ind).pr_code
+        static get_detail_product_code = (detail_ind) => {
+          return this.get_detail(detail_ind).product_code
         }
         static get_detail_jans = (detail_ind) => {
           return this.get_detail(detail_ind).jans
@@ -722,8 +710,8 @@ JAN
         }
         // 
         //
-        static get_pr_code_maker = (detail, jan) => {
-          return this.get_shop(detail.shop_ind).code + detail.pr_code + "-" + this.get_maker(detail.maker_ind).code + "-" + this.get_endfive(jan)
+        static get_product_code_maker = (detail, jan) => {
+          return this.get_shop(detail.shop_ind).code + detail.product_code + "-" + this.get_maker(detail.maker_ind).code + "-" + this.get_endfive(jan)
         }
         //
         // 
@@ -750,10 +738,12 @@ JAN
 ＝＞JAN
 
 -----＜＝`,
-            pr_code: "",
+            product_name: "",
+            product_code: "",
             shop_ind: 0,
             maker_ind: 0,
-            jans: [""]
+            jans: [""],
+            hidden_jans: [],
           })
           nextTick(() => {
             this.init_tippy()
@@ -800,11 +790,17 @@ JAN
           ls_pp.value.product_details.forEach((val, ind) => {
             console.log(val.jans)
             val.jans = [...val.jans.filter((jan_val, jan_ind) => {
-              return jan_val !== undefined
+              return jan_val !== ""
             })]
             console.log(val.jans)
           })
           console.log(ls_pp.value.product_details[0].jans)
+        }
+        //
+        // jans の要素に空白があればその要素を削除する
+        // 
+        static hidden_jan = (detail_ind, jan_ind) => {
+          this.get_detail_jans(detail_ind).splice(jan_ind, 1)
         }
         //
         // 
@@ -890,7 +886,7 @@ JAN
         // 
         // 自社コードを フォーム➤テキスト へ反映
         // 
-        static set_freetext_pr_code = (detail_ind) => {
+        static set_freetext_product_code = (detail_ind) => {
           // detail_ind の配列の free_text を取得して改行コードで配列に変換
           let arr = this.split_lines(this.get_detail(detail_ind).free_text)
           // ターゲットインデックスがない場合はアンカーがないので終了
@@ -900,9 +896,9 @@ JAN
           const target_is_nan = isNaN(arr[target_ind + 1])
           // 空白か数値なら上書き
           if (arr[target_ind + 1] === "" || !target_is_nan) {
-            arr[target_ind + 1] = this.get_detail_pr_code(detail_ind)
+            arr[target_ind + 1] = this.get_detail_product_code(detail_ind)
           } else {
-            arr.splice(target_ind + 1, 0, this.get_detail_pr_code(detail_ind))
+            arr.splice(target_ind + 1, 0, this.get_detail_product_code(detail_ind))
           }
           // 改行コードを変換しなおして代入
           this.get_detail(detail_ind).free_text = this.join_lines(arr)
@@ -949,14 +945,14 @@ JAN
             begin: arr.indexOf("＝＞-----"),
             shop: arr.indexOf("＝＞SHOP"),
             maker: arr.indexOf("＝＞メーカー"),
-            pr_code: arr.indexOf("＝＞自社コード"),
+            product_code: arr.indexOf("＝＞自社コード"),
             val_code: arr.indexOf("＝＞品番"),
             jans: arr.indexOf("＝＞JAN"),
             end: arr.indexOf("-----＜＝"),
           }
           // 
           // 自社コード
-          ls_pp.value.product_details[detail_ind].pr_code = arr[inds.pr_code + 1]
+          ls_pp.value.product_details[detail_ind].product_code = arr[inds.product_code + 1]
           // 
           // JAN
           const free_jans = []
@@ -1036,7 +1032,7 @@ JAN
           ls_pp.value.shop_list_hidden.splice(shop_ind, 1)
         }
         // 削除
-        static remove_hop_list_hidden = (shop_ind) => {
+        static remove_shop_list_hidden = (shop_ind) => {
           // 削除
           ls_pp.value.shop_list_hidden.splice(shop_ind, 1)
         }
@@ -1066,7 +1062,7 @@ JAN
           ls_pp.value.maker_list_hidden.splice(maker_ind, 1)
         }
         // 削除
-        static remove_hop_list_hidden = (maker_ind) => {
+        static remove_maker_list_hidden = (maker_ind) => {
           // 削除
           ls_pp.value.maker_list_hidden.splice(maker_ind, 1)
         }
@@ -1183,6 +1179,19 @@ JAN
           ls_md.init_tippy()
           ls_md.select_local_storage()
           ls_md.remove_blank_jan()
+
+          const _resolve = () => {
+            return new Promise((resolve, reject) => {
+              ls_md.select_local_storage()
+              resolve()
+            })
+          }
+          const _await = async () => {
+            const rtn = await _resolve()
+          }
+          _await().then(() => {
+            ls_md.remove_blank_jan()
+          })
         }
       })
       //
@@ -1196,7 +1205,7 @@ JAN
         ls_pp.value.product_details.forEach((val, ind) => {
           ls_md.set_freetext_shop(ind)
           ls_md.set_freetext_maker(ind)
-          ls_md.set_freetext_pr_code(ind)
+          ls_md.set_freetext_product_code(ind)
           ls_md.set_freetext_jans(ind)
         })
       })
