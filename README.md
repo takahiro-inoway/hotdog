@@ -1,4 +1,9 @@
 ```
+addon input_historyに追加したい機能
+・タグ表示するときのリストの並び替え設定
+　└追加順とか文字順とか➤自分で並び替える機能までは必要なさそう
+
+
 https://solutions.vaio.com/2154#s1
 https://zenn.dev/na9/articles/23c18a0d2d8ee2
 
