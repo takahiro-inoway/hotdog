@@ -1,4 +1,28 @@
 ```
+大理石テクスチャ
+https://ambientcg.com/view?id=Marble006
+
+無料テクスチャとのノードサンプルを乗せてくれてるサイト
+https://madeinpc.blog.fc2.com/blog-entry-1448.html
+
+反射床
+https://ambientcg.com/view?id=Tiles074
+
+木の床
+https://ambientcg.com/view?id=WoodFloor024
+
+スポンジ
+https://ambientcg.com/view?id=Sponge001
+
+黒革
+https://madeinpc.blog.fc2.com/blog-entry-1450.html
+
+タイル
+https://madeinpc.blog.fc2.com/blog-entry-1427.html
+
+PBRマテリアルアドオン
+https://madeinpc.blog.fc2.com/blog-entry-1223.html
+
 blender マテリアル　大理石
 https://booth.pm/ja/items/2877067?registration=1
 
