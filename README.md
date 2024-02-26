@@ -1,4 +1,8 @@
 ```
+
+ディスク容量改善
+https://recoverit.wondershare.jp/windows-tips/resolve-disk-usage-on-windows.html
+
 珪藻土とか素材（成分の元の意）の画像が意外とない
 ↓blenderで作れそう
 https://rdlp.jp/archives/otherdesign/lp/200539?sp=1&rdlp_flg=1
