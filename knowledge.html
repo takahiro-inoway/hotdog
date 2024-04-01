@@ -375,6 +375,29 @@ https://www.microsoft.com/ja-jp/software-download/windows8ISO
 https://engrholiday.jp/ios/iphone-network-change-4g/`
               }
             ],
+          },
+          {
+            id: "09",
+            title: "Baffalo LS720DN0802B NASでバックアップが異常終了する",
+            text: [
+              {
+                theme: "①Nas側で制限をかけてしまっている",
+                description: `Nasにログイン➤ファイル➤ファイル制限 が有効になってないか`
+              },
+              {
+                theme: "②サーバー側のバックアップ操作の問題",
+                description: `バックアップ操作時のログを確認する`
+              },
+              {
+                theme: "③バックアップしようとしているファイルにアクセス権限がついてないか",
+                description: `ファイルにアクセス権限が付与されていると、バックアップ操作が失敗してしまう`
+              },
+              {
+                theme: "④Nas使用不可文字を使用していないか？",
+                description: `使用不可文字があります。公式ナレッジ参照
+https://www.buffalo.jp/support/faq/detail/2587.html`
+              }
+            ],
           }
         ]
       })
