@@ -144,7 +144,6 @@ window.onload = function () {
       ・商品名 55
       */
       // チェックテーブル表示
-      console.log(document.getElementById("addon_table").style.display)
       document.getElementById("addon_table").style.display = "table"
       play_checked([
         '商品番号',
@@ -276,7 +275,19 @@ window.onload = function () {
         border-left: 1px solid #b2b2b2;
       }
       #addon_save_table thead tr{
-        background-color: #FFEBEB;
+        background-color: #FFDFDF;
+      }
+      #addon_save_tbody tr{
+        background-color: #FFF8F8;
+      }
+      .addon_rms-table-data tbody td{
+        padding: 2px !important;
+      }
+      .addon_rms-table-data .ma-t-6{
+        margin-top: 0 !important;
+      }
+      .bdrd_6{
+        border-radius: 6px !important;
       }
       </style>
     `
@@ -285,7 +296,9 @@ window.onload = function () {
     // ボタンを配置
     const addon_btn_1 = `
       <div id="addon_area">
-      <button id='addon_btn_1' class='addon_btn uk-button uk-button-primary uk-button-small'>拡張を開始</button>
+      <button id='addon_btn_1' class='addon_btn uk-button uk-button-primary uk-button-small bdrd_6'>拡張を開始</button>
+      <br>
+      <button id='addon_btn_2' class='addon_btn uk-button uk-button-muted uk-button-small bdrd_6'>リセット</button>
       </div>
     `
     // HTMLに挿入
@@ -345,8 +358,8 @@ window.onload = function () {
                       <div class="rms-grid pa-lr-0">
                         <div class="rms-row align-items-center">
 
-                          <div>プレビュー
-                            <div style="overflow-y: scroll; overflow-x: clip; height: 344px; background: white; width: 430px; margin: 2px;">
+                          <div>
+                            <div style="overflow-y: scroll; overflow-x: clip; height: 300px; background: white; width: 430px; margin: 2px;">
                               <div class="rms-row align-items-center">
                                 <div id="addon_kanren_result">
                                 </div>
@@ -355,18 +368,18 @@ window.onload = function () {
                           </div>
 
                           <div>
-                            <div style="display: flex;">
-                              <input id="addon_copy_btn" class="uk-button uk-button-primary uk-button-small" type="button" value="コピー">
-                              <input id="addon_kanren_input" type="number" class="rms-input input-block text-right" maxlength="1" value="3" style="width: 4rem; text-align: left !important;">
-                              個横並び
+                            <div>
+                              <button onclick="document.getElementById('addon_reset_btn').click()" class="rms-btn btn-default btn-width-sm bdrd_6">全て解除</button>
+                              <button onclick="document.getElementById('addon_close_btn').click()" class="rms-btn btn-red btn-fill btn-md btn-width-md bdrd_6">拡張を閉じる</button>
                             </div>
                             <div>
-                              <textarea id="addon_kanren_textarea" rows="14" type="text" style="width: 280px; text-align: left !important; border: 1px solid #c5c6ca;" class="rms-input input-block text-right">
+                              <textarea id="addon_kanren_textarea" rows="11" type="text" style="width: 280px; text-align: left !important; border: 1px solid #c5c6ca;" class="rms-input input-block text-right">
                               </textarea>
                             </div>
-                            <div>
-                              <button onclick="document.getElementById('addon_reset_btn').click()" class="rms-btn btn-default btn-width-md">拡張リセット</button>
-                              <button onclick="document.getElementById('addon_close_btn').click()" class="rms-btn btn-red btn-fill btn-md btn-width-md">拡張を終了</button>
+                            <div style="display: flex;">
+                              <input id="addon_copy_btn" class="uk-button uk-button-primary uk-button-small bdrd_6" type="button" value="コピー">
+                              <input id="addon_kanren_input" type="number" class="rms-input input-block text-right" maxlength="1" value="3" style="width: 4rem; text-align: left !important;">
+                              個横並び
                             </div>
                           </div>
 
@@ -383,6 +396,11 @@ window.onload = function () {
     </div>
 
       `
+      // flexで囲った要素内に要素が複数存在する場合は、関連リンク表示が既にあるので、関連リンク表示を一旦削除
+      if (document.getElementById("addon_outerdiv").children.length > 1) {
+        document.getElementById("addon_kanren_div").parentNode.removeChild(document.getElementById("addon_kanren_div"))
+      }
+      // 関連リンク表示を挿入
       document.getElementById("addon_outerdiv").insertAdjacentHTML("beforeend", addon_kanren_area)
 
       // 保存ボタンと保存テーブルの処理
@@ -393,29 +411,21 @@ window.onload = function () {
       }
       // HTML文字列 ボタンエリアと保持テーブル
       const searchResult_save_html = `
+      <div id="addon_btn_div">
+        <button id="addon_selectend_btn" style="background: #07c; color: white; display: none;" class="rms-btn btn-blue btn-width-sm bdrd_6">選択終了</button>
+        <button id="addon_selectstart_btn" style="display: inline-block;" class="rms-btn btn-blue btn-width-sm bdrd_6">選択開始</button>
+        <button id="addon_reset_btn" class="rms-btn btn-default btn-width-sm bdrd_6">全て解除</button>
+        <button id="addon_close_btn" class="rms-btn btn-red btn-fill btn-md btn-width-md bdrd_6">拡張を閉じる</button>
+      </div>
       <table id="addon_save_table" class="addon_rms-table-data">
         ${document.getElementsByClassName("rms-table-data")[0].children[0].outerHTML}
         <tbody id="addon_save_tbody">
         </tbody>
       </table>
-      <div id="addon_btn_div">
-        <button id="addon_save_btn" style="width: 200px;" class="rms-btn btn-blue btn-width-md">拡張保存(1番目のみ)</button>
-        <button id="addon_reset_btn" class="rms-btn btn-default btn-width-md">拡張リセット</button>
-        <button id="addon_close_btn" class="rms-btn btn-red btn-fill btn-md btn-width-md">拡張を終了</button>
-      </div>
       `
       // 挿入
       document.getElementById("searchResult").insertAdjacentHTML("afterbegin", searchResult_save_html)
 
-
-      //
-      // ローカルストレージにデータあれば画面上に表示する
-      // これに tr 要素を入れていく
-      let savearr = [];
-      // ストレージにデータあれば取得
-      if (localStorage.getItem("savedElements")) {
-        document.getElementById("addon_save_tbody").insertAdjacentHTML("beforeend", JSON.parse(localStorage.getItem("savedElements")).join(""))
-      }
 
       //
       // ローカルストレージから取得して表示しなおす
@@ -430,119 +440,17 @@ window.onload = function () {
         // 一旦削除して挿入
         document.getElementById("addon_save_tbody").innerText = ""
         document.getElementById("addon_save_tbody").insertAdjacentHTML("beforeend", savearr.join(""))
-      }
-
-      //
-      // 拡張保存ボタン ローカルストレージに保存
-      document.getElementById("addon_save_btn").addEventListener("click", () => {
-        // ローカルストレージの保存処理
-        // 保存する要素を取得
-        const firstchild = document.getElementsByClassName("rms-table-data")[0].children[1].firstChild
-        // これに tr 要素を入れていく
-        let savearr = [];
-        // ストレージにデータあれば取得
-        if (localStorage.getItem("savedElements")) {
-          savearr = JSON.parse(localStorage.getItem("savedElements"))
-        }
-        // HTML文字列を配列に格納
-        savearr.push(firstchild.outerHTML)
-        // 配列を文字列に変換してローカルストレージに保存
-        localStorage.setItem("savedElements", JSON.stringify(savearr));
-        // 表示処理
-        tbody_render()
-        rowbtn_render()
-        kanren_output()
-      }, false)
-
-
-      //
-      // 拡張リセットボタン ローカルストレージを初期化
-      document.getElementById("addon_reset_btn").addEventListener("click", () => {
-        localStorage.setItem("savedElements", JSON.stringify([""]));
-        // tbody 要素の削除
-        document.getElementById("addon_save_tbody").innerText = ""
-        // 関連リンクの初期化
-        kanren_output()
-      }, false)
-
-      //
-      // 拡張を終了ボタン ローカルストレージを初期化 画面上表示削除
-      document.getElementById("addon_close_btn").addEventListener("click", () => {
-        localStorage.setItem("savedElements", JSON.stringify([""]));
-        document.getElementById("addon_btn_div").parentNode.removeChild(document.getElementById("addon_btn_div"))
-        document.getElementById("addon_save_table").parentNode.removeChild(document.getElementById("addon_save_table"))
-        // 関連リンク表示も削除
-        document.getElementById("addon_kanren_div").parentNode.removeChild(document.getElementById("addon_kanren_div"))
-        // 拡張開始ボタンを表示
-        document.getElementById("addon_btn_1").style.display = "block";
-      }, false)
-
-
-      //
-      // 行ボタンをリセットして表示しなおす
-      const rowbtn_render = () => {
-        //
-        // 解除ボタン ローカルストレージ再保存
-        Array.from(document.getElementById("addon_save_tbody").children).forEach((val, ind) => {
-          val.firstChild.innerText = ""
-          const tmp = `
-          <span data-ind="${ind}" data-action="remove" class="addon_row_btn color-blue white-space nowrap" style="cursor: pointer;">解除</span>
-          `
-          val.firstChild.insertAdjacentHTML("afterbegin", tmp)
-
-          const tmp2 = `
-          <span data-ind="${ind}" data-action="up" class="addon_row_btn color-blue white-space nowrap" style="cursor: pointer;">▲上へ</span>
-          <span data-ind="${ind}" data-action="down" class="addon_row_btn color-blue white-space nowrap" style="cursor: pointer;">▼下へ</span>
-          <br>
-          `
-          val.children[2].insertAdjacentHTML("afterbegin", tmp2)
-
-          //
-          // 解除、▲上へ、▼下へボタン
-          Array.from(val.getElementsByClassName("addon_row_btn")).forEach((val, ind) => {
-            val.addEventListener("click", (e) => {
-              // これに tr 要素を入れていく
-              let savearr = [];
-              // ストレージにデータあれば取得
-              if (localStorage.getItem("savedElements")) {
-                savearr = JSON.parse(localStorage.getItem("savedElements"))
-              } else {
-                // 表示処理
-                tbody_render()
-                rowbtn_render()
-                kanren_output()
-                return;
-              }
-              console.log(e.target.dataset.action, e.target.dataset.ind)
-              if (e.target.dataset.action === "remove") {
-                // イベント発生した要素のインデックスで配列要素削除
-                savearr.splice(Number(e.target.dataset.ind), 1)
-              } else if (e.target.dataset.action === "up" && Number(e.target.dataset.ind) !== 0) {
-                // 指定されたインデックス番号の要素を取得して保存
-                const tmp = savearr[Number(e.target.dataset.ind)];
-                // 指定されたインデックス番号の要素を削除
-                savearr.splice(Number(e.target.dataset.ind), 1);
-                // 削除した要素をその前の位置に挿入
-                savearr.splice(Number(e.target.dataset.ind) - 1, 0, tmp);
-              } else if (e.target.dataset.action === "down" && Number(e.target.dataset.ind) + 1 != val.getElementsByClassName("addon_row_btn").length) {
-                // 指定されたインデックス番号の要素を取得して保存
-                const tmp = savearr[Number(e.target.dataset.ind)];
-                // 指定されたインデックス番号の要素を削除
-                savearr.splice(Number(e.target.dataset.ind), 1);
-                // 削除した要素をその前の位置に挿入
-                savearr.splice(Number(e.target.dataset.ind) + 1, 0, tmp);
-              }
-              // 配列を文字列に変換してローカルストレージに保存
-              localStorage.setItem("savedElements", JSON.stringify(savearr));
-              // 表示処理
-              tbody_render()
-              rowbtn_render()
-              kanren_output()
-            }, false)
-          })
+        // 一旦全部ボタンを消す
+        Array.from(document.getElementsByClassName("addon_select_rowbtn")).forEach((val, ind) => {
+          val.parentNode.removeChild(val)
         })
+        // 選択中であればボタンを再表示
+        if (document.getElementById("addon_selectend_btn").style.display === "inline-block") {
+          selectrow_btn_set()
+        }
+
       }
-      rowbtn_render()
+      tbody_render()
 
       //
       // 関連リンクの文字列を表示する + HTML表示
@@ -606,14 +514,23 @@ window.onload = function () {
             "【20％OFFクーポン】",
             "【25％OFFクーポン】",
             "【100円OFFクーポン】",
+            "【150円OFFクーポン】",
             "【200円OFFクーポン】",
+            "【250円OFFクーポン】",
             "【300円OFFクーポン】",
+            "【350円OFFクーポン】",
             "【400円OFFクーポン】",
+            "【450円OFFクーポン】",
             "【500円OFFクーポン】",
+            "【550円OFFクーポン】",
             "【600円OFFクーポン】",
+            "【650円OFFクーポン】",
             "【700円OFFクーポン】",
+            "【750円OFFクーポン】",
             "【800円OFFクーポン】",
+            "【850円OFFクーポン】",
             "【900円OFFクーポン】",
+            "【950円OFFクーポン】",
             "【1000円OFFクーポン】",
             "【1100円OFFクーポン】",
             "【1200円OFFクーポン】",
@@ -635,50 +552,105 @@ window.onload = function () {
             "【2800円OFFクーポン】",
             "【2900円OFFクーポン】",
             "【3000円OFFクーポン】",
+            "【5％OFFクーポン対象】",
+            "【10％OFFクーポン対象】",
+            "【15％OFFクーポン対象】",
+            "【20％OFFクーポン対象】",
+            "【25％OFFクーポン対象】",
+            "【100円OFFクーポン対象】",
+            "【150円OFFクーポン対象】",
+            "【200円OFFクーポン対象】",
+            "【250円OFFクーポン対象】",
+            "【300円OFFクーポン対象】",
+            "【350円OFFクーポン対象】",
+            "【400円OFFクーポン対象】",
+            "【450円OFFクーポン対象】",
+            "【500円OFFクーポン対象】",
+            "【550円OFFクーポン対象】",
+            "【600円OFFクーポン対象】",
+            "【650円OFFクーポン対象】",
+            "【700円OFFクーポン対象】",
+            "【750円OFFクーポン対象】",
+            "【800円OFFクーポン対象】",
+            "【850円OFFクーポン対象】",
+            "【900円OFFクーポン対象】",
+            "【950円OFFクーポン対象】",
+            "【1000円OFFクーポン対象】",
+            "【1100円OFFクーポン対象】",
+            "【1200円OFFクーポン対象】",
+            "【1300円OFFクーポン対象】",
+            "【1400円OFFクーポン対象】",
+            "【1500円OFFクーポン対象】",
+            "【1600円OFFクーポン対象】",
+            "【1700円OFFクーポン対象】",
+            "【1800円OFFクーポン対象】",
+            "【1900円OFFクーポン対象】",
+            "【2000円OFFクーポン対象】",
+            "【2100円OFFクーポン対象】",
+            "【2200円OFFクーポン対象】",
+            "【2300円OFFクーポン対象】",
+            "【2400円OFFクーポン対象】",
+            "【2500円OFFクーポン対象】",
+            "【2600円OFFクーポン対象】",
+            "【2700円OFFクーポン対象】",
+            "【2800円OFFクーポン対象】",
+            "【2900円OFFクーポン対象】",
+            "【3000円OFFクーポン対象】",
+            "【選べる特典付】",
+            "【正規販売店】",
+            "【海外×】",
+            "【海外✕】",
           ]
           jokyo.forEach((val, ind) => {
             name = name.split(val).join("")
           })
-          // (~~)の除去
+          jokyo.forEach((val, ind) => {
+            const tmp = val.split("【").join().split("】").join()
+            name = name.split(tmp).join("")
+          })
+          // ( or（ 以降の除去
           name = name.split("(")[0]
           name = name.split("（")[0]
+          // 先頭【】の除去
+          if (name.indexOf("【") === 0 && name.split("【").length === 2) {
+            name = name.split("】")[1]
+          }
+          // 最後尾【】の除去
+          if (name.indexOf("】") === name.length - 1 && name.split("【").length === 2) {
+            name = name.split("【")[0]
+          }
+          // 【 、と、】、 の間に任意の文字が 0個以上含まれるパターンを表す正規表現で除去
+          name = name.replace("/【[^】]+】/", "")
 
           // https://tshop.r10s.jp/passageshop/cabinet/kihon35/b10010562-001.jpg
           // URL↑から↓の形式にする
           // https://thumbnail.image.rakuten.co.jp/@0_mall/passageshop/cabinet/kihon41/p10013424-001.jpg
-          let url = val.children[4].getElementsByTagName("a")[0].getAttribute("href")
-          let urlarr = url.split("/")
-          urlarr = {
-            filename: urlarr[urlarr.length - 1].slice(1),
-            shop: urlarr[urlarr.length - 4],
-            shopkihon: urlarr[urlarr.length - 4] + "/" + urlarr[urlarr.length - 3] + "/" + urlarr[urlarr.length - 2]
-          }
-          const shoparr = [
-            ["passage", "p"],
-            ["passage-mens", "p"],
-          ]
-          // 総当たりで探す
-          shoparr.forEach((val, ind) => {
-            if (val[0] === urlarr.shop) {
-              urlarr.filename = val[1] + urlarr.filename
-            }
-          })
-          url = `https://thumbnail.image.rakuten.co.jp/@0_mall/${urlarr.shopkihon}/${urlarr.filename}`
+          // https://thumbnail.image.rakuten.co.jp/@0_mall/passageshop/cabinet/kihon41/p10013420-001.jpg
 
+          // https://tshop.r10s.jp/passage-mens/cabinet/kihon03/p10008791-001.jpg
+          // https://thumbnail.image.rakuten.co.jp/@0_mall/passage-mens/cabinet/kihon03/p10008791-001.jpg
+          // 
+
+          let imgarr = val.getElementsByTagName("img")[0].getAttribute("src").split("/")
+          imgarr = {
+            filename: imgarr[imgarr.length - 1],
+            shopkihon: imgarr[imgarr.length - 4] + "/" + imgarr[imgarr.length - 3] + "/" + imgarr[imgarr.length - 2]
+          }
+
+          img = `https://thumbnail.image.rakuten.co.jp/@0_mall/${imgarr.shopkihon}/${imgarr.filename}`
 
           return {
-            url: url,
-            img: val.getElementsByTagName("img")[0].getAttribute("src"),
+            url: val.children[4].getElementsByTagName("a")[0].getAttribute("href"),
+            img: img,
             name: name
           }
         })
-        console.log(arr)
 
         const col = Number(document.getElementById("addon_kanren_input").value)
 
         // widthを何％にするのか
         let width = Math.floor(100 / col)
-        
+
 
 
         let htmlarr = arr.map((val, ind) => {
@@ -704,6 +676,131 @@ window.onload = function () {
       }
       kanren_output()
 
+      //
+      // 対象行をローカルストレージに保存、画面上にも表示する
+      const saverow_local = (row) => {
+        // ローカルストレージの保存処理
+        // 保存する要素を取得
+        const firstchild = document.getElementsByClassName("rms-table-data")[0].children[1].children[row]
+        // これに tr 要素を入れていく
+        let savearr = [];
+        // ストレージにデータあれば取得
+        if (localStorage.getItem("savedElements")) {
+          savearr = JSON.parse(localStorage.getItem("savedElements"))
+        }
+        // HTML文字列を配列に格納
+        savearr.push(firstchild.outerHTML)
+        // 配列を文字列に変換してローカルストレージに保存
+        localStorage.setItem("savedElements", JSON.stringify(savearr));
+        // 表示処理
+        tbody_render()
+        kanren_output()
+      }
+
+      //
+      // 対象行をローカルストレージから削除、画面上にも表示する
+      const removerow_local = (row) => {
+        // これに tr 要素を入れていく
+        let savearr = [];
+        // ストレージにデータあれば取得
+        if (localStorage.getItem("savedElements")) {
+          savearr = JSON.parse(localStorage.getItem("savedElements"))
+        }
+        // 配列要素削除
+        savearr.splice(Number(row), 1)
+        // 配列を文字列に変換してローカルストレージに保存
+        localStorage.setItem("savedElements", JSON.stringify(savearr));
+        // 表示処理
+        tbody_render()
+        kanren_output()
+      }
+
+      //
+      // 保存、解除ボタンをセットしなおす
+      const selectrow_btn_set = () => {
+        // 一旦全部ボタンを消す
+        Array.from(document.getElementsByClassName("addon_select_rowbtn")).forEach((val, ind) => {
+          val.parentNode.removeChild(val)
+        })
+        // 全行に保存ボタン追加
+        const tbody_elem = document.getElementsByClassName("rms-table-data")[0].getElementsByTagName("tbody")[0]
+        Array.from(tbody_elem.children).forEach((val, ind) => {
+          val.children[2].insertAdjacentHTML("afterbegin", "<button data-row='" + ind + "' class='addon_select_rowbtn addon_selectsave_rowbtn uk-button uk-button-primary uk-button-small bdrd_6'>保存</button>")
+        })
+        // 全ての保存ボタンにイベント付与
+        Array.from(document.getElementsByClassName("addon_selectsave_rowbtn")).forEach((val, ind) => {
+          val.addEventListener("click", (e) => {
+            saverow_local(e.target.dataset.row)
+          }, false)
+        })
+        // 保存テーブル上の全行に解除ボタン追加
+        Array.from(document.getElementById("addon_save_tbody").children).forEach((val, ind) => {
+          val.children[2].insertAdjacentHTML("afterbegin", "<button data-row='" + ind + "' class='addon_select_rowbtn addon_selectremove_rowbtn uk-button uk-button-primary uk-button-small bdrd_6'>解除</button>")
+        })
+        // 保存テーブル上の全ての解除ボタンにイベント付与
+        Array.from(document.getElementsByClassName("addon_selectremove_rowbtn")).forEach((val, ind) => {
+          val.addEventListener("click", (e) => {
+            removerow_local(e.target.dataset.row)
+          }, false)
+        })
+      }
+
+      //
+      // 全て解除ボタン ローカルストレージを初期化
+      document.getElementById("addon_reset_btn").addEventListener("click", () => {
+        localStorage.setItem("savedElements", JSON.stringify([""]));
+        // tbody 要素の削除
+        document.getElementById("addon_save_tbody").innerText = ""
+        // 関連リンクの初期化
+        kanren_output()
+      }, false)
+
+      //
+      // 拡張を閉じるボタン ローカルストレージを初期化 画面上表示削除
+      document.getElementById("addon_close_btn").addEventListener("click", () => {
+        document.getElementById("addon_btn_div").parentNode.removeChild(document.getElementById("addon_btn_div"))
+        document.getElementById("addon_save_table").parentNode.removeChild(document.getElementById("addon_save_table"))
+        // 関連リンク表示も削除
+        document.getElementById("addon_kanren_div").parentNode.removeChild(document.getElementById("addon_kanren_div"))
+        // 拡張開始ボタンを表示
+        document.getElementById("addon_btn_1").style.display = "inline-block";
+        // 保存、解除ボタンを全消し
+        Array.from(document.getElementsByClassName("addon_select_rowbtn")).forEach((val, ind) => {
+          val.parentNode.removeChild(val)
+        })
+      }, false)
+
+      // 選択開始ボタン
+      document.getElementById("addon_selectstart_btn").addEventListener("click", () => {
+        //
+        // ボタンを切り替える
+        document.getElementById("addon_selectstart_btn").style.display = "none"
+        document.getElementById("addon_selectend_btn").style.display = "inline-block"
+        // ボタンセットしなおし
+        selectrow_btn_set()
+      }, false)
+
+      // 選択終了ボタン
+      document.getElementById("addon_selectend_btn").addEventListener("click", () => {
+        //
+        // ボタンを切り替える
+        document.getElementById("addon_selectstart_btn").style.display = "inline-block"
+        document.getElementById("addon_selectend_btn").style.display = "none"
+        // 全部ボタンを消す
+        Array.from(document.getElementsByClassName("addon_select_rowbtn")).forEach((val, ind) => {
+          val.parentNode.removeChild(val)
+        })
+      }, false)
+
+
+
+
+
+      //
+      // 個数変更でイベント実行
+      document.getElementById("addon_kanren_input").addEventListener("change", () => {
+        kanren_output()
+      }, false)
 
       //
       // コピーボタンイベント
@@ -712,18 +809,28 @@ window.onload = function () {
         // テキストをクリップボードにコピー
         document.execCommand("copy");
       }, false)
-      //
-      // 個数変更でイベント実行
-      document.getElementById("addon_kanren_input").addEventListener("change", () => {
-        kanren_output()
-      }, false)
 
     }
 
-    // ボタンにイベントを付与
+
+
+    // 拡張開始ボタンにイベントを付与
     document.getElementById("addon_btn_1").addEventListener("click", () => {
       play()
     }, false)
+
+    // リセットボタンにイベントを付与
+    document.getElementById("addon_btn_2").addEventListener("click", () => {
+      // 拡張開始ボタンを表示
+      document.getElementById("addon_btn_1").style.display = "inline-block";
+      // 関連リンク表示も削除
+      document.getElementById("addon_kanren_div").parentNode.removeChild(document.getElementById("addon_kanren_div"))
+      document.getElementById("addon_save_table").parentNode.removeChild(document.getElementById("addon_save_table"))
+      document.getElementById("addon_btn_div").parentNode.removeChild(document.getElementById("addon_btn_div"))
+    }, false)
+
+
+
 
 
 
