@@ -1,0 +1,25 @@
+{
+  "name": "RMS csvDL一括チェック",
+  "description": "CSVダウンロードチェックを一括で行います。",
+  "version": "1.0",
+  "manifest_version": 2,
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://item.rms.rakuten.co.jp/rms-item-download/shops/*",
+        "https://item.rms.rakuten.co.jp/rms-sku/shops/*/items*"
+      ],
+      "js": [
+        "script.js"
+      ]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "addons@example.com"
+    }
+  }
+}
