@@ -1,0 +1,34 @@
+{
+  "name": "楽天RMS/Yahoo拡張機能",
+  "description": "楽天RMSの全般的な拡張機能を提供します。Yahooの拡張機能も提供します。",
+  "version": "2.0.1",
+  "manifest_version": 3,
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://item.rms.rakuten.co.jp/rms-item-download/shops/*",
+        "https://item.rms.rakuten.co.jp/rms-sku/shops/*/items*",
+        "https://item.rms.rakuten.co.jp/rms-sku/shops/*/item/edit/*",
+        "https://coupon.rms.rakuten.co.jp/rms/mall/coupon/*",
+        "https://pro.store.yahoo.co.jp/*/coupon/*",
+        "https://pro.store.yahoo.co.jp/*/coupon/index/new-edit",
+        "https://editor.store.yahoo.co.jp/RT/*/PageEdit/*",
+        "https://datatool.rms.rakuten.co.jp/access/item*",
+        "https://datatool.rms.rakuten.co.jp/rdreport/*"
+      ],
+      "js": [
+        "script.js"
+      ]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "addons@example.com"
+    }
+  }
+}
