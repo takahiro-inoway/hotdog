@@ -22,14 +22,14 @@
       <table>
         <thead>
           <tr>
-            <th>No</th>
+            <th style="font-size: smaller; width: 2px; padding: 2px;">No</th>
             <th>問題</th>
             <th>回答</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(row, rowIndex) in pp.test_csv" :key="rowIndex">
-            <td>{{ rowIndex }}</td>
+            <td style="font-size: smaller; width: 2px; padding: 2px;">{{ rowIndex }}</td>
             <td style="width: 40vw; cursor: pointer;">{{ row[0] }}</td>
             <td :style="{ color: 'black', backgroundColor: row[1].bgColor, cursor: 'pointer'}"
               @click="md.toggleBackgroundColor(rowIndex)">
