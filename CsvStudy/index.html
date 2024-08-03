@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="mvp.css">
+  <title>Document</title>
+  <style>
+    .pd2{
+      padding: 2px;
+    }
+    .mg2{
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <article class="pd2">
+      <table>
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>問題</th>
+            <th>回答</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(row, rowIndex) in pp.test_csv" :key="rowIndex">
+            <td>{{ rowIndex }}</td>
+            <td style="width: 40vw; cursor: pointer;">{{ row[0] }}</td>
+            <td :style="{ color: 'black', backgroundColor: row[1].bgColor, cursor: 'pointer'}"
+              @click="md.toggleBackgroundColor(rowIndex)">
+              {{ row[1].text }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+  </div>
+
+  <script type="module">
+    import {
+      createApp,
+      ref,
+      onMounted
+    } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+    createApp({
+      setup() {
+        const pp = ref({
+          test_csv: []
+        })
+
+        const md = class {
+          static async csv_load() {
+            const response = await fetch('test.csv')
+            const text = await response.text()
+            const rows = text.split('\r\n').map(row => row.split(','))
+            console.log(rows)
+            pp.value.test_csv = rows.map((row, index) => ({
+              0: row[0],
+              1: { text: row[1], bgColor: 'black' }
+            }))
+
+            console.log(pp.value.test_csv)
+
+          }
+
+          static toggleBackgroundColor(rowIndex) {
+            const cell = pp.value.test_csv[rowIndex][1]
+            cell.bgColor = cell.bgColor === 'black' ? 'white' : 'black'
+          }
+        }
+
+        onMounted(() => {
+          md.csv_load()
+
+        });
+
+        return {
+          pp,
+          md
+        }
+      }
+    }).mount('#app')
+  </script>
+
+</body>
+
+</html>
