@@ -7,17 +7,29 @@
   <link rel="stylesheet" href="mvp.css">
   <title>Document</title>
   <style>
-    .pd2{
+    .pd2 {
       padding: 2px;
     }
-    .mg2{
+
+    .mg2 {
       margin: 2px;
+    }
+
+    .fixed_banner {
+      position: fixed;
+      z-index: 99999;
+      top: 5px;
+      right: 5px;
     }
   </style>
 </head>
+
 <body>
 
   <div id="app">
+    <div class="fixed_banner">
+      <input type="text" placeholder="キーワードを入力で絞り込み" @input="md.keywordInput($event)">
+    </div>
     <article class="pd2">
       <table>
         <thead>
@@ -28,12 +40,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(row, rowIndex) in pp.test_csv" :key="rowIndex">
-            <td style="font-size: smaller; width: 2px; padding: 2px;">{{ rowIndex }}</td>
-            <td style="width: 40vw; cursor: pointer;">{{ row[0] }}</td>
-            <td :style="{ color: 'black', backgroundColor: row[1].bgColor, cursor: 'pointer'}"
-              @click="md.toggleBackgroundColor(rowIndex)">
+          <tr v-for="(row, rowIndex) in pp.view_csv" :key="rowIndex">
+            <td style="font-size: smaller; width: 2px; padding: 2px;">{{ row[0] }}</td>
+            <td
+              :style="{ width: '40vw', cursor: 'pointer', 'font-weight': row[1].ftweight, 'font-size': row[1].ftsize, height: row[1].height}">
               {{ row[1].text }}
+            </td>
+            <td :style="{ color: '#999', backgroundColor: row[2].bgColor, cursor: 'pointer'}"
+              @click="md.toggleBackgroundColor(row[0])">
+              {{ row[2].text }}
             </td>
           </tr>
         </tbody>
@@ -51,7 +66,8 @@
     createApp({
       setup() {
         const pp = ref({
-          test_csv: []
+          test_csv: [],
+          view_csv: []
         })
 
         const md = class {
@@ -60,19 +76,52 @@
             const text = await response.text()
             const rows = text.split('\r\n').map(row => row.split(','))
             console.log(rows)
-            pp.value.test_csv = rows.map((row, index) => ({
-              0: row[0],
-              1: { text: row[1], bgColor: 'black' }
-            }))
+            pp.value.test_csv = rows.map((row, index) => {
+
+              if (row[0] === '' && row[1] === '') {
+                return {
+                  0: '',
+                  1: { text: row[0], ftweight: '', ftsize: '', height: '' },
+                  2: { text: row[1], bgColor: '' }
+                }
+              }
+              if (row[1] === '') {
+                return {
+                  0: '',
+                  1: { text: row[0], ftweight: 'bold', ftsize: 'large', height: '80px' },
+                  2: { text: row[1], bgColor: '' }
+                }
+              }
+              return {
+                0: index,
+                1: { text: row[0], ftweight: '', ftsize: '', height: '' },
+                2: { text: row[1], bgColor: '#999' }
+              }
+
+            })
+
+            pp.value.view_csv = [...pp.value.test_csv]
 
             console.log(pp.value.test_csv)
 
           }
 
           static toggleBackgroundColor(rowIndex) {
-            const cell = pp.value.test_csv[rowIndex][1]
-            cell.bgColor = cell.bgColor === 'black' ? 'white' : 'black'
+            const cell = pp.value.test_csv[rowIndex][2]
+            cell.bgColor = cell.bgColor === '#999' ? 'white' : '#999'
           }
+
+          static keywordInput(e) {
+            pp.value.view_csv = [...pp.value.test_csv.filter((val) => {
+              // 空の場合比較せず除去
+              if (val[1].text === '' || val[2].text === '') return false
+              if (val[1].text.indexOf(e.target.value) !== -1 || val[2].text.indexOf(e.target.value) !== -1) {
+                return true
+              }
+              return false
+            })]
+          }
+
         }
 
         onMounted(() => {
