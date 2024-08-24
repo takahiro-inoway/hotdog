@@ -15,11 +15,33 @@
       margin: 2px;
     }
 
+    .mg4 {
+      margin: 4px;
+    }
+
+    .w100per {
+      width: 100%;
+    }
+
     .fixed_banner {
       position: fixed;
       z-index: 99999;
       top: 5px;
       right: 5px;
+    }
+    
+    .group_btn {
+      height: 3rem;
+      text-align: center;
+      color: #118bee;
+      background: white;
+      border-color: #118bee;
+      font-weight: bold;
+    }
+
+    .active {
+      color: white;
+      background: #118bee;
     }
   </style>
 </head>
@@ -27,7 +49,18 @@
 <body>
 
   <div id="app">
-    <div class="fixed_banner">
+    <div style="display: flex; justify-content: center;">
+      <h3>科目を選択</h3>
+    </div>
+    <div style="display: flex; justify-content: center; flex-direction: column;flex-wrap: wrap; height: 8rem;">
+      <div v-for="(group, groupindex) in pp.group_list" style="flex: 1 1 1rem; display: flex; justify-content: center;">
+        <input type="button" @click="md.group_btn_click($event, group)" :value="group.name"
+          class="mg4 w100per group_btn">
+      </div>
+    </div>
+
+    <div class="fixed_banner" style="display: flex;">
+      <div style="width: 10rem; font-size: smaller; background: #118bee; color: white; border-radius: 3px; text-align: center; height: 2rem; line-height: 2rem; font-weight: bold;">(% pp.current_group.name %)</div>
       <input type="text" placeholder="キーワードを入力で絞り込み" @input="md.keywordInput($event)">
     </div>
     <article class="pd2">
@@ -41,14 +74,14 @@
         </thead>
         <tbody>
           <tr v-for="(row, rowIndex) in pp.view_csv" :key="rowIndex">
-            <td style="font-size: smaller; width: 2px; padding: 2px;">{{ row[0] }}</td>
+            <td style="font-size: smaller; width: 2px; padding: 2px;">(% row[0] %)</td>
             <td
               :style="{ width: '40vw', cursor: 'pointer', 'font-weight': row[1].ftweight, 'font-size': row[1].ftsize, height: row[1].height}">
-              {{ row[1].text }}
+              (% row[1].text %)
             </td>
             <td :style="{ color: '#999', backgroundColor: row[2].bgColor, cursor: 'pointer'}"
               @click="md.toggleBackgroundColor(row[0])">
-              {{ row[2].text }}
+              (% row[2].text %)
             </td>
           </tr>
         </tbody>
@@ -66,43 +99,84 @@
     createApp({
       setup() {
         const pp = ref({
+          current_group: {name: '未選択', filename: 'none'},
           test_csv: [],
-          view_csv: []
+          view_csv: [],
+          group_list: [
+            { name: '憲法', filename: 'kenpo' },
+            { name: '行政法', filename: 'gyoseho' },
+            { name: '民法', filename: 'minpo' },
+            { name: '会社法', filename: 'kaishaho' },
+            { name: '刑法', filename: 'keiho' },
+            { name: '商法', filename: 'shoho' },
+            { name: '民事訴訟法', filename: 'minjisoshoho' },
+            { name: '倒産法', filename: 'tosanho' },
+            { name: '刑事訴訟法', filename: 'keijisoshoho' },
+            { name: '一般知識', filename: 'ippanchishiki' }
+          ]
         })
 
         const md = class {
-          static async csv_load() {
-            const response = await fetch('test.csv')
-            const text = await response.text()
-            const rows = text.split('\r\n').map(row => row.split(','))
-            console.log(rows)
-            pp.value.test_csv = rows.map((row, index) => {
 
-              if (row[0] === '' && row[1] === '') {
-                return {
-                  0: '',
-                  1: { text: row[0], ftweight: '', ftsize: '', height: '' },
-                  2: { text: row[1], bgColor: '' }
-                }
-              }
-              if (row[1] === '') {
-                return {
-                  0: '',
-                  1: { text: row[0], ftweight: 'bold', ftsize: 'large', height: '80px' },
-                  2: { text: row[1], bgColor: '' }
-                }
-              }
-              return {
-                0: index,
-                1: { text: row[0], ftweight: '', ftsize: '', height: '' },
-                2: { text: row[1], bgColor: '#999' }
-              }
-
+          static group_btn_click = (e, group_obj = {name: '未選択', filename: 'none'}) => {
+            Array.from(document.getElementsByClassName('group_btn')).forEach((val, ind) => {
+              val.classList.remove('active')
             })
+            e.target.classList.add('active')
+
+
+            pp.value.current_group = group_obj
+
+            this.csv_load()
+          }
+
+          static async csv_load() {
+            try {
+
+              const response = await fetch(pp.value.current_group.filename + '.csv')
+              // レスポンスが正常でない場合はエラーをスロー
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              const text = await response.text()
+              const rows = text.split('\r\n').map(row => row.split(','))
+              pp.value.test_csv = rows.map((row, index) => {
+
+                if (row[0] === '' && row[1] === '') {
+                  return {
+                    0: '',
+                    1: { text: row[0], ftweight: '', ftsize: '', height: '' },
+                    2: { text: row[1], bgColor: '' }
+                  }
+                }
+                if (row[1] === '') {
+                  return {
+                    0: '',
+                    1: { text: row[0], ftweight: 'bold', ftsize: 'large', height: '80px' },
+                    2: { text: row[1], bgColor: '' }
+                  }
+                }
+                return {
+                  0: index,
+                  1: { text: row[0], ftweight: '', ftsize: '', height: '' },
+                  2: { text: row[1], bgColor: '#999' }
+                }
+
+              })
+
+            } catch (error) {
+              // ファイルが読み込めない場合
+              pp.value.test_csv = [
+                {
+                  0: 0,
+                  1: { text: 'ファイルがないか読み込みできませんでした。', ftweight: '', ftsize: '', height: '' },
+                  2: { text: '', bgColor: '#999' }
+                }
+              ]
+
+            }
 
             pp.value.view_csv = [...pp.value.test_csv]
-
-            console.log(pp.value.test_csv)
 
           }
 
@@ -125,7 +199,7 @@
         }
 
         onMounted(() => {
-          md.csv_load()
+          // md.csv_load()
 
         });
 
@@ -133,7 +207,9 @@
           pp,
           md
         }
-      }
+      },
+      delimiters: ['(%', '%)']
+
     }).mount('#app')
   </script>
 
