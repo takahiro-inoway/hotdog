@@ -51,13 +51,9 @@
       </div>
       <div style="display: flex; justify-content: center; flex-direction: column;flex-wrap: wrap; height: 8rem;">
         <div v-for="(group, groupindex) in pp.group_list" style="flex: 1 1 1rem; display: flex; justify-content: center;">
-          <input @click="md.group_btn_click($event, group)" :value="group.name"
-
-class="mg4 w100per group_btn" type="button"> </div>
+          <input @click="md.group_btn_click($event, group)" :value="group.name" class="mg4 w100per group_btn" type="button">
+        </div>
       </div>
-      <input @click="md.audio_run()" value="test" type="button"> <audio id="audio_file"
-
-        :src="'test' + pp.audio_file + '.wav'"></audio>
       <div class="fixed_banner" style="display: flex;">
         <div style="width: 10rem; font-size: smaller; background: #118bee; color: white; border-radius: 3px; text-align: center; height: 2rem; line-height: 2rem; font-weight: bold;">
           (% pp.current_group.name %)</div>
@@ -74,13 +70,9 @@ class="mg4 w100per group_btn" type="button"> </div>
           </thead>
           <tbody>
             <tr v-for="(row, rowIndex) in pp.view_csv" :key="rowIndex">
-              <td style="font-size: smaller; width: 2px; padding: 2px;">(%
-                row[0] %)</td>
-              <td :style="{ width: '40vw', cursor: 'pointer', 'font-weight': row[1].ftweight, 'font-size': row[1].ftsize, height: row[1].height}">
-                (% row[1].text %) </td>
-              <td :style="{ color: '#999', backgroundColor: row[2].bgColor, cursor: 'pointer'}"
-
-                @click="md.toggleBackgroundColor(row[0])"> (% row[2].text %) </td>
+              <td style="font-size: smaller; width: 2px; padding: 2px;">(% row[0] %)</td>
+              <td :style="{ width: '40vw', cursor: 'pointer', 'font-weight': row[1].ftweight, 'font-size': row[1].ftsize, height: row[1].height}">(% row[1].text %) </td>
+              <td :style="{ color: '#999', backgroundColor: row[2].bgColor, cursor: 'pointer'}" @click="md.toggleBackgroundColor(row[0])"> (% row[2].text %) </td>
             </tr>
           </tbody>
         </table>
@@ -91,7 +83,7 @@ class="mg4 w100per group_btn" type="button"> </div>
       createApp,
       ref,
       onMounted
-    } from 'vue.esm-browser.js'
+    } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 
     createApp({
       setup() {
