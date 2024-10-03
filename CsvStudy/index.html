@@ -51,7 +51,7 @@
       </div>
       <div style="display: flex; justify-content: center; flex-direction: column;flex-wrap: wrap; height: 8rem;">
         <div v-for="(group, groupindex) in pp.group_list" style="flex: 1 1 1rem; display: flex; justify-content: center;">
-          <input @click="md.group_btn_click($event, group)" :value="group.name" class="mg4 w100per group_btn" type="button">
+          <input @click="md.group_btn_click($event, group)" :value="group.name" :disabled="group.disabled" class="mg4 w100per group_btn" type="button">
         </div>
       </div>
       <div class="fixed_banner" style="display: flex;">
@@ -92,16 +92,16 @@
           test_csv: [],
           view_csv: [],
           group_list: [
-            { name: '憲法', filename: 'kenpo' },
-            { name: '行政法', filename: 'gyoseho' },
-            { name: '行政手続法', filename: 'gyosetetsuzukiho' },
-            { name: '民法', filename: 'minpo' },
-            { name: '会社法', filename: 'kaishaho' },
-            { name: '刑法', filename: 'keiho' },
-            { name: '商法', filename: 'shoho' },
-            { name: '民事訴訟法', filename: 'minjisoshoho' },
-            { name: '倒産法', filename: 'tosanho' },
-            { name: '刑事訴訟法', filename: 'keijisoshoho' }
+            { name: '憲法', filename: 'kenpo', disabled: false},
+            { name: '行政法', filename: 'gyoseho', disabled: false},
+            { name: '行政手続法', filename: 'gyosetetsuzukiho', disabled: false},
+            { name: '民法', filename: 'minpo', disabled: false},
+            { name: '会社法', filename: 'kaishaho', disabled: false},
+            { name: '刑法', filename: 'keiho', disabled: true},
+            { name: '商法', filename: 'shoho', disabled: true},
+            { name: '民事訴訟法', filename: 'minjisoshoho', disabled: true},
+            { name: '倒産法', filename: 'tosanho', disabled: true},
+            { name: '刑事訴訟法', filename: 'keijisoshoho', disabled: true}
           ],
           audio_file: 1
         })
