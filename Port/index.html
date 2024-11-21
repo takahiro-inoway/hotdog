@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Portfolio</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #111;
+            color: #fff;
+        }
+
+        .header {
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(to bottom, #111, transparent);
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .creator-name {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .content {
+            padding: 6rem 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin: 2rem 0 1rem;
+            color: #888;
+        }
+
+        /* フィーチャードセクション */
+        .featured {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .featured-main video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .featured-side {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .featured-side video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* デュアルグリッド */
+        .dual-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .dual-grid video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .dual-grid video:hover {
+            transform: scale(1.02);
+        }
+
+        /* 垂直スクロールグリッド */
+        .vertical-scroll {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 1rem;
+            margin-bottom: 4rem;
+        }
+
+        .vertical-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .vertical-scroll::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        .vertical-scroll::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 3px;
+        }
+
+        .vertical-scroll video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* 水平スクロールスライダー */
+        .horizontal-scroll {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .horizontal-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scroll-item {
+            flex: 0 0 500px;
+            scroll-snap-align: start;
+        }
+
+        .scroll-item video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 968px) {
+            .featured {
+                grid-template-columns: 1fr;
+            }
+            
+            .dual-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vertical-scroll {
+                grid-template-columns: 1fr;
+                max-height: 800px;
+            }
+
+            .scroll-item {
+                flex: 0 0 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1 class="creator-name">{{ creatorName }}</h1>
+        </header>
+
+        <main class="content">
+            <!-- フィーチャードセクション（1+2レイアウト） -->
+            <section>
+                <h2 class="section-title">Featured Works</h2>
+                <div class="featured">
+                    <div class="featured-main">
+                        <video :src="featuredVideos[0].src" controls></video>
+                    </div>
+                    <div class="featured-side">
+                        <video v-for="video in featuredVideos.slice(1, 3)" 
+                               :key="video.id" 
+                               :src="video.src" 
+                               controls></video>
+                    </div>
+                </div>
+            </section>
+
+            <!-- デュアルグリッド（2列レイアウト） -->
+            <section>
+                <h2 class="section-title">Latest Projects</h2>
+                <div class="dual-grid">
+                    <video v-for="video in dualGridVideos" 
+                           :key="video.id" 
+                           :src="video.src" 
+                           controls></video>
+                </div>
+            </section>
+
+            <!-- 垂直スクロール（2列） -->
+            <section>
+                <h2 class="section-title">Archive</h2>
+                <div class="vertical-scroll">
+                    <video v-for="video in verticalScrollVideos" 
+                           :key="video.id" 
+                           :src="video.src" 
+                           controls></video>
+                </div>
+            </section>
+
+            <!-- 水平スクロール -->
+            <section>
+                <h2 class="section-title">More Works</h2>
+                <div class="horizontal-scroll">
+                    <div v-for="video in horizontalScrollVideos" 
+                         :key="video.id" 
+                         class="scroll-item">
+                        <video :src="video.src" controls></video>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    creatorName: 'CREATIVE STUDIO',
+                    featuredVideos: [
+                        { id: 1, src: '310022897136447488.mp4' },
+                        { id: 2, src: '310123341363937288.mp4' },
+                        { id: 3, src: '310040166423994376.mp4' }
+                    ],
+                    dualGridVideos: [
+                        { id: 4, src: '310130663838588937.mp4' },
+                        { id: 5, src: '310133442787282945.mp4' }
+                    ],
+                    verticalScrollVideos: [
+                        { id: 6, src: '310120586037559302.mp4' },
+                        { id: 7, src: '310126003258003462.mp4' },
+                        { id: 8, src: '310115773191163905.mp4' },
+                        { id: 9, src: '310113780506701831.mp4' }
+                    ],
+                    horizontalScrollVideos: [
+                        { id: 10, src: '310052857037324296.mp4' },
+                        { id: 11, src: '310034477743996933.mp4' },
+                        { id: 12, src: '310108937679409154.mp4' }
+                    ]
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
