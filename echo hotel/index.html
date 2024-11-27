@@ -63,12 +63,32 @@
       white-space: nowrap;
     }
 
-    .genres {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      margin: 0;
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .player {
+        flex-direction: column;
+        padding: 12px;
+        gap: 12px;
+      }
+
+      .player-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+      }
+
+      .player-controls {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .progress-bar {
+        margin-top: 4px;
+      }
     }
 
     .genre-btn {
@@ -361,12 +381,6 @@
       <div class="container">
         <header class="header">
           <h1>Echo Hotel</h1>
-          <div class="genres">
-            <button v-for="genre in ['すべて', 'POP', 'JAZZ', 'CLASSIC']" :key="genre" class="genre-btn"
-              :class="{ active: selectedGenre === genre }" @click="selectedGenre = genre">
-              {{ genre }}
-            </button>
-          </div>
         </header>
       </div>
     </div>
@@ -434,12 +448,14 @@
     </div>
 
     <div class="player" v-if="currentSong">
-      <img :src="currentSong.title + '.jpg'" alt="" style="width: 60px; height: 60px; border-radius: 10px;">
-      <div class="player-info">
-        <h3>{{ currentSong.title }}</h3>
-        <p>@takahiro_inoue1</p>
-        <div class="progress-bar" @click="seek">
-          <div class="progress" :style="{ width: progress + '%' }"></div>
+      <div style="display: flex; flex: 1; width: 100%;">
+        <img :src="currentSong.title + '.jpg'" alt="" style="width: 60px; height: 60px; border-radius: 10px; margin-right: 20px;">
+        <div class="player-info">
+          <h3>{{ currentSong.title }}</h3>
+          <p>@takahiro_inoue1</p>
+          <div class="progress-bar" @click="seek">
+            <div class="progress" :style="{ width: progress + '%' }"></div>
+          </div>
         </div>
       </div>
       <div class="player-controls">
