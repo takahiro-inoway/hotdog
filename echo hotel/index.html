@@ -4,19 +4,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#9b4dca">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Echo Hotel">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192x192.png">
   <title>Echo Hotel | 音楽再生アプリ</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="songs.js"></script>
   <style>
     :root {
       --gradient: linear-gradient(135deg, #9b4dca 0%, #ff69b4 100%);
       --play-icon-size: 24px;
+      --active-control: #ff69b4;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -25,6 +34,7 @@
       color: white;
       min-height: 100vh;
       padding-bottom: 100px;
+      overscroll-behavior-y: none;
     }
 
     .sticky-header {
@@ -32,6 +42,7 @@
       top: 0;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       z-index: 100;
       padding: 0.5rem 0;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -89,6 +100,31 @@
       .progress-bar {
         margin-top: 4px;
       }
+
+      .songs-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px !important;
+      }
+
+      .section-title {
+        font-size: 1.5rem !important;
+      }
+
+      .genre-section h2 {
+        font-size: 1.5rem !important;
+      }
+
+      .song-card.grid-view {
+        padding: 10px !important;
+      }
+
+      .song-info h3 {
+        font-size: 0.9rem !important;
+      }
+
+      .song-info p {
+        font-size: 0.8rem !important;
+      }
     }
 
     .genre-btn {
@@ -127,6 +163,7 @@
       margin-top: 30px;
       margin-bottom: 30px;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .history {
@@ -147,6 +184,12 @@
       gap: 10px;
       overflow-x: auto;
       padding-bottom: 10px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .history-list::-webkit-scrollbar {
+      display: none;
     }
 
     .history-item {
@@ -158,11 +201,15 @@
       padding: 8px;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .history-item:hover {
       background: rgba(255, 255, 255, 0.15);
+    }
+
+    .history-item:active {
+      transform: scale(0.95);
     }
 
     .history-item img {
@@ -208,11 +255,16 @@
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .song-card:hover {
       background: rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
+    }
+
+    .song-card:active {
+      transform: scale(0.98);
     }
 
     .song-card.grid-view {
@@ -318,6 +370,7 @@
       right: 0;
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       padding: 20px;
       display: flex;
       align-items: center;
@@ -349,11 +402,33 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
     .control-btn:hover {
       background: rgba(255, 255, 255, 0.1);
       transform: scale(1.1);
+    }
+
+    .control-btn:active {
+      transform: scale(0.95);
+    }
+
+    .control-btn.active {
+      color: var(--active-control);
+      background: rgba(255, 105, 180, 0.1);
+    }
+
+    .control-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background-color: var(--active-control);
+      border-radius: 50%;
     }
 
     .progress-bar {
@@ -371,6 +446,17 @@
       background: linear-gradient(to right, #9b4dca, #ff69b4);
       border-radius: 2px;
       transition: width 0.1s linear;
+    }
+
+    @media (display-mode: standalone) {
+      body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: calc(100px + env(safe-area-inset-bottom));
+      }
+
+      .player {
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      }
     }
   </style>
 </head>
@@ -429,7 +515,7 @@
 
       <template v-for="genre in ['POP', 'JAZZ', 'CLASSIC']">
         <section v-if="songsByGenre(genre).length" :key="genre" class="genre-section">
-          <h2>{{ genre }}</h2>
+          <h2>{{ genre }} <span style="font-size: medium;">{{ songsByGenre(genre).length }}曲</span></h2>
           <div :class="isGridView ? 'songs-grid' : 'songs-list'">
             <div v-for="song in songsByGenre(genre)" :key="song.id" class="song-card" :class="{ 
                                  'active-song': currentSong && currentSong.id === song.id,
@@ -449,7 +535,8 @@
 
     <div class="player" v-if="currentSong">
       <div style="display: flex; flex: 1; width: 100%;">
-        <img :src="currentSong.title + '.jpg'" alt="" style="width: 60px; height: 60px; border-radius: 10px; margin-right: 20px;">
+        <img :src="currentSong.title + '.jpg'" alt=""
+          style="width: 60px; height: 60px; border-radius: 10px; margin-right: 20px;">
         <div class="player-info">
           <h3>{{ currentSong.title }}</h3>
           <p>@takahiro_inoue1</p>
@@ -459,18 +546,18 @@
         </div>
       </div>
       <div class="player-controls">
-        <button class="control-btn" @click="toggleShuffle">
+        <button class="control-btn" :class="{ active: shuffleMode }" @click="toggleShuffle" title="シャッフル再生">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" />
           </svg>
         </button>
-        <button class="control-btn" @click="previousSong">
+        <button class="control-btn" @click="previousSong" title="前の曲">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
           </svg>
         </button>
-        <button class="control-btn" @click="togglePlay">
+        <button class="control-btn" @click="togglePlay" :title="isPlaying ? '一時停止' : '再生'">
           <svg v-if="isPlaying" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
           </svg>
@@ -478,12 +565,13 @@
             <path d="M8 5v14l11-7z" />
           </svg>
         </button>
-        <button class="control-btn" @click="nextSong">
+        <button class="control-btn" @click="nextSong" title="次の曲">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
           </svg>
         </button>
-        <button class="control-btn" @click="toggleRepeat">
+        <button class="control-btn" :class="{ active: repeatMode !== 'none' }" @click="toggleRepeat"
+          :title="'リピート: ' + (repeatMode === 'none' ? 'オフ' : repeatMode === 'one' ? '1曲' : '全曲')">
           <svg v-if="repeatMode === 'one'" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z" />
           </svg>
@@ -493,112 +581,28 @@
         </button>
       </div>
     </div>
+
   </div>
 
   <script>
-    const { createApp, ref, computed, onMounted } = Vue;
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+
+    const { createApp, ref, computed, onMounted, watch } = Vue;
 
     createApp({
       setup() {
-        const songs = ref([
-          {
-            id: 1,
-            title: "fast sax MAX !",
-            genre: "JAZZ",
-            recommended: true
-          },
-          {
-            id: 2,
-            title: "fast sax level",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 3,
-            title: "fast sax story",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 4,
-            title: "fast sax story history",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 5,
-            title: "Electric fast sax !",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 6,
-            title: "Tric fast sax !",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 7,
-            title: "piano sax faster",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 8,
-            title: "Very fast sax and piano",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 9,
-            title: "Jump ! Kick ! Rowling !",
-            genre: "JAZZ",
-            recommended: true
-          },
-          {
-            id: 10,
-            title: "Jam ! Cockie ! Cake !",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 11,
-            title: "Morning Song",
-            genre: "JAZZ",
-            recommended: true
-          },
-          {
-            id: 12,
-            title: "Morning Best",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 13,
-            title: "IMPACT JAZZ",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 14,
-            title: "IMPACT JAZZ",
-            genre: "JAZZ",
-            recommended: false
-          },
-          {
-            id: 15,
-            title: "Danger Shot High",
-            genre: "JAZZ",
-            recommended: true
-          },
-          {
-            id: 16,
-            title: "Danger SH",
-            genre: "JAZZ",
-            recommended: false
-          },
-        ]);
-
+        const songs = ref(SONGS);
+        const shuffledSongs = ref({});
         const currentSong = ref(null);
         const isPlaying = ref(false);
         const audio = ref(null);
@@ -610,11 +614,40 @@
         const playHistory = ref([]);
         const shuffleHistory = ref([]);
 
+        // シャッフル関数
+        function shuffleArray(array) {
+          const shuffled = [...array];
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          return shuffled;
+        }
+
+        // ジャンルごとのシャッフルされた曲のリストを管理
+        function updateShuffledSongs() {
+          const genres = ['POP', 'JAZZ', 'CLASSIC'];
+          genres.forEach(genre => {
+            const genreSongs = songs.value.filter(song => song.genre === genre);
+            shuffledSongs.value[genre] = shuffleArray(genreSongs);
+          });
+        }
+
+        // シャッフルモード監視
+        watch(shuffleMode, (newValue) => {
+          if (newValue) {
+            updateShuffledSongs();
+          }
+        });
+
         const recommendedSongs = computed(() => {
           return songs.value.filter(song => song.recommended);
         });
 
         function songsByGenre(genre) {
+          if (shuffleMode.value) {
+            return shuffledSongs.value[genre] || [];
+          }
           return songs.value.filter(song => song.genre === genre);
         }
 
@@ -623,10 +656,11 @@
           audio.value.addEventListener('timeupdate', updateProgress);
           audio.value.addEventListener('ended', handleSongEnd);
 
-          // ランダムに最初の曲を選択
+          // 最初の曲を選択して音声ファイルを準備
           if (songs.value.length > 0) {
             const randomIndex = Math.floor(Math.random() * songs.value.length);
             currentSong.value = songs.value[randomIndex];
+            audio.value.src = currentSong.value.title + '.mp3';
           }
         });
 
@@ -657,7 +691,6 @@
           });
           isPlaying.value = true;
 
-          // Add to history
           const historyIndex = playHistory.value.findIndex(s => s.id === song.id);
           if (historyIndex !== -1) {
             playHistory.value.splice(historyIndex, 1);
@@ -669,6 +702,10 @@
         }
 
         function togglePlay() {
+          if (!audio.value.src && currentSong.value) {
+            audio.value.src = currentSong.value.title + '.mp3';
+          }
+
           if (isPlaying.value) {
             audio.value.pause();
           } else {
@@ -698,49 +735,49 @@
         function nextSong() {
           if (!currentSong.value) return;
 
-          let availableSongs;
-
+          let nextSong;
           if (shuffleMode.value) {
-            // シャッフルモードの場合
-            // まだ再生していない曲をフィルタリング
-            availableSongs = songs.value.filter(song =>
-              !shuffleHistory.value.includes(song.id)
-            );
-
-            // もし全ての曲を再生し終わっていた場合、履歴をリセット
-            if (availableSongs.length === 0) {
-              shuffleHistory.value = [currentSong.value.id];
-              availableSongs = songs.value.filter(song =>
-                !shuffleHistory.value.includes(song.id)
-              );
-            }
-
-            // ランダムに次の曲を選択
-            const nextSong = availableSongs[Math.floor(Math.random() * availableSongs.length)];
-            shuffleHistory.value.push(nextSong.id);
-            playSong(nextSong);
-
+            const currentGenre = currentSong.value.genre;
+            const genreSongs = shuffledSongs.value[currentGenre];
+            const currentIndex = genreSongs.findIndex(song => song.id === currentSong.value.id);
+            const nextIndex = (currentIndex + 1) % genreSongs.length;
+            nextSong = genreSongs[nextIndex];
           } else {
-            // 通常再生の場合
-            const currentIndex = songs.value.findIndex(song => song.id === currentSong.value.id);
-            const nextIndex = (currentIndex + 1) % songs.value.length;
-            playSong(songs.value[nextIndex]);
+            const currentGenre = currentSong.value.genre;
+            const genreSongs = songs.value.filter(song => song.genre === currentGenre);
+            const currentIndex = genreSongs.findIndex(song => song.id === currentSong.value.id);
+            const nextIndex = (currentIndex + 1) % genreSongs.length;
+            nextSong = genreSongs[nextIndex];
           }
+
+          playSong(nextSong);
         }
 
         function previousSong() {
-          const currentIndex = songs.value.findIndex(song => song.id === currentSong.value.id);
-          const previousIndex = currentIndex === 0 ? songs.value.length - 1 : currentIndex - 1;
-          playSong(songs.value[previousIndex]);
+          if (!currentSong.value) return;
+
+          let prevSong;
+          if (shuffleMode.value) {
+            const currentGenre = currentSong.value.genre;
+            const genreSongs = shuffledSongs.value[currentGenre];
+            const currentIndex = genreSongs.findIndex(song => song.id === currentSong.value.id);
+            const prevIndex = currentIndex === 0 ? genreSongs.length - 1 : currentIndex - 1;
+            prevSong = genreSongs[prevIndex];
+          } else {
+            const currentGenre = currentSong.value.genre;
+            const genreSongs = songs.value.filter(song => song.genre === currentGenre);
+            const currentIndex = genreSongs.findIndex(song => song.id === currentSong.value.id);
+            const prevIndex = currentIndex === 0 ? genreSongs.length - 1 : currentIndex - 1;
+            prevSong = genreSongs[prevIndex];
+          }
+
+          playSong(prevSong);
         }
 
         function toggleShuffle() {
           shuffleMode.value = !shuffleMode.value;
-          // シャッフルモードを切り替えた時に履歴をリセット
           if (shuffleMode.value) {
-            shuffleHistory.value = currentSong.value ? [currentSong.value.id] : [];
-          } else {
-            shuffleHistory.value = [];
+            updateShuffledSongs();
           }
         }
 
@@ -760,6 +797,7 @@
           isGridView,
           songsByGenre,
           playHistory,
+          shuffleMode,
           playSong,
           togglePlay,
           seek,
@@ -772,6 +810,7 @@
       }
     }).mount('#app');
   </script>
+
 </body>
 
 </html>
