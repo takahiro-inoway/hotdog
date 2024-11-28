@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Echo Hotel">
-  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192x192.png">
   <title>Echo Hotel | 音楽再生アプリ</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
@@ -74,6 +73,23 @@
       white-space: nowrap;
     }
 
+    .fade-enter-active,
+    .fade-leave-active {
+      transition: opacity 0.5s ease;
+    }
+
+    .fade-enter-from,
+    .fade-leave-to {
+      opacity: 0;
+    }
+
+    .recommended-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
     @media (max-width: 768px) {
       .header h1 {
         font-size: 1.5rem;
@@ -81,7 +97,7 @@
 
       .player {
         flex-direction: column;
-        padding: 12px;
+        padding: 12px 12px 24px 12px;
         gap: 12px;
       }
 
@@ -99,6 +115,11 @@
 
       .progress-bar {
         margin-top: 4px;
+      }
+
+      .recommended-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
       }
 
       .songs-grid {
@@ -371,7 +392,7 @@
       background: rgba(0, 0, 0, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      padding: 20px;
+      padding: 20px 20px 30px 20px;
       display: flex;
       align-items: center;
       gap: 20px;
@@ -472,10 +493,10 @@
     </div>
 
     <div class="container">
-      <section class="featured" v-if="recommendedSongs.length">
+      <section class="featured" v-if="displayedRecommendedSongs.length">
         <h2 class="section-title">おすすめの曲</h2>
-        <div class="songs-grid">
-          <div v-for="song in recommendedSongs" :key="song.id" class="song-card grid-view"
+        <div name="fade" class="recommended-grid">
+          <div v-for="song in displayedRecommendedSongs" :key="song.id" class="song-card grid-view"
             :class="{ 'active-song': currentSong && currentSong.id === song.id }" @click="playSong(song)">
             <img :src="song.title + '.jpg'" :alt="song.title">
             <div class="song-info">
@@ -581,7 +602,6 @@
         </button>
       </div>
     </div>
-
   </div>
 
   <script>
@@ -613,8 +633,8 @@
         const isGridView = ref(false);
         const playHistory = ref([]);
         const shuffleHistory = ref([]);
+        const displayedRecommendedSongs = ref([]);
 
-        // シャッフル関数
         function shuffleArray(array) {
           const shuffled = [...array];
           for (let i = shuffled.length - 1; i > 0; i--) {
@@ -624,7 +644,6 @@
           return shuffled;
         }
 
-        // ジャンルごとのシャッフルされた曲のリストを管理
         function updateShuffledSongs() {
           const genres = ['POP', 'JAZZ', 'CLASSIC'];
           genres.forEach(genre => {
@@ -633,16 +652,45 @@
           });
         }
 
-        // シャッフルモード監視
         watch(shuffleMode, (newValue) => {
           if (newValue) {
             updateShuffledSongs();
           }
         });
 
-        const recommendedSongs = computed(() => {
-          return songs.value.filter(song => song.recommended);
-        });
+        function updateDisplayedRecommendedSongs() {
+          const availableSongs = [...songs.value];
+          const selected = [];
+
+          while (selected.length < 4 && availableSongs.length > 0) {
+            const randomIndex = Math.floor(Math.random() * availableSongs.length);
+            selected.push(availableSongs.splice(randomIndex, 1)[0]);
+          }
+
+          displayedRecommendedSongs.value = selected;
+        }
+
+        function startRecommendedSongsRotation() {
+          updateDisplayedRecommendedSongs();
+
+          setInterval(() => {
+            const availableSongs = songs.value.filter(
+              song => !displayedRecommendedSongs.value.includes(song)
+            );
+
+            if (availableSongs.length > 0) {
+              // 先頭の曲を削除し、新しい曲を最後に追加
+              const newSongs = [...displayedRecommendedSongs.value];
+              newSongs.shift(); // 先頭の要素を削除
+
+              // ランダムに新しい曲を選択
+              const randomNewSong = availableSongs[Math.floor(Math.random() * availableSongs.length)];
+              newSongs.push(randomNewSong); // 新しい曲を最後に追加
+
+              displayedRecommendedSongs.value = newSongs;
+            }
+          }, 5000);
+        }
 
         function songsByGenre(genre) {
           if (shuffleMode.value) {
@@ -650,19 +698,6 @@
           }
           return songs.value.filter(song => song.genre === genre);
         }
-
-        onMounted(() => {
-          audio.value = new Audio();
-          audio.value.addEventListener('timeupdate', updateProgress);
-          audio.value.addEventListener('ended', handleSongEnd);
-
-          // 最初の曲を選択して音声ファイルを準備
-          if (songs.value.length > 0) {
-            const randomIndex = Math.floor(Math.random() * songs.value.length);
-            currentSong.value = songs.value[randomIndex];
-            audio.value.src = currentSong.value.title + '.mp3';
-          }
-        });
 
         function updateProgress() {
           if (audio.value.duration) {
@@ -768,7 +803,7 @@
             const genreSongs = songs.value.filter(song => song.genre === currentGenre);
             const currentIndex = genreSongs.findIndex(song => song.id === currentSong.value.id);
             const prevIndex = currentIndex === 0 ? genreSongs.length - 1 : currentIndex - 1;
-            prevSong = genreSongs[prevIndex];
+            prevSong = genreSongs.prevSong = genreSongs[prevIndex];
           }
 
           playSong(prevSong);
@@ -787,17 +822,30 @@
           else repeatMode.value = 'none';
         }
 
+        onMounted(() => {
+          audio.value = new Audio();
+          audio.value.addEventListener('timeupdate', updateProgress);
+          audio.value.addEventListener('ended', handleSongEnd);
+
+          if (songs.value.length > 0) {
+            const randomIndex = Math.floor(Math.random() * songs.value.length);
+            currentSong.value = songs.value[randomIndex];
+            audio.value.src = currentSong.value.title + '.mp3';
+            startRecommendedSongsRotation();
+          }
+        });
+
         return {
           songs,
           currentSong,
           isPlaying,
           progress,
           selectedGenre,
-          recommendedSongs,
           isGridView,
           songsByGenre,
           playHistory,
           shuffleMode,
+          displayedRecommendedSongs,
           playSong,
           togglePlay,
           seek,
@@ -810,7 +858,6 @@
       }
     }).mount('#app');
   </script>
-
 </body>
 
 </html>
