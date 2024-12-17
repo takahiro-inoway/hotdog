@@ -1,8 +1,6 @@
 ```
 
 
-fourthcomit@s324.xrea.com
-
 
 
 ディスク容量改善
