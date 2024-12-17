@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>micro:bit v2 Sensor Monitor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      padding: 0;
+    }
+
+    .device-type {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+
+    .connect-button {
+      padding: 15px 25px;
+      font-size: 18px;
+      margin: 10px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .sensor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .sensor-box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    .sensor-box h2 {
+      margin-top: 0;
+      color: #333;
+      border-bottom: 2px solid #2196F3;
+      padding-bottom: 5px;
+    }
+
+    .value {
+      font-size: 20px;
+      color: #2196F3;
+      font-weight: bold;
+    }
+
+    .error {
+      color: red;
+      padding: 10px;
+      background-color: #ffe6e6;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+
+    @media (max-width: 768px) {
+      .sensor-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="device-type" class="device-type">デバイスタイプ: 検出中...</div>
+  <button id="connect-button" class="connect-button">micro:bitに接続</button>
+  <div id="error-message" class="error" style="display: none;"></div>
+
+  <div class="sensor-grid">
+    <!-- 加速度センサー -->
+    <div class="sensor-box">
+      <h2>加速度センサー</h2>
+      <p>X: <span id="accel-x" class="value">0</span> mg</p>
+      <p>Y: <span id="accel-y" class="value">0</span> mg</p>
+      <p>Z: <span id="accel-z" class="value">0</span> mg</p>
+    </div>
+
+    <!-- ジャイロスコープ -->
+    <div class="sensor-box">
+      <h2>ジャイロスコープ</h2>
+      <p>X: <span id="gyro-x" class="value">0</span> °/s</p>
+      <p>Y: <span id="gyro-y" class="value">0</span> °/s</p>
+      <p>Z: <span id="gyro-z" class="value">0</span> °/s</p>
+    </div>
+
+    <!-- 磁力計 -->
+    <div class="sensor-box">
+      <h2>磁力計</h2>
+      <p>X: <span id="mag-x" class="value">0</span> µT</p>
+      <p>Y: <span id="mag-y" class="value">0</span> µT</p>
+      <p>Z: <span id="mag-z" class="value">0</span> µT</p>
+      <p>方位: <span id="compass" class="value">0</span>°</p>
+    </div>
+
+    <!-- 温度センサー -->
+    <div class="sensor-box">
+      <h2>温度センサー</h2>
+      <p>温度: <span id="temperature" class="value">0</span> °C</p>
+    </div>
+
+    <!-- 光センサー -->
+    <div class="sensor-box">
+      <h2>光センサー</h2>
+      <p>明るさ: <span id="light" class="value">0</span></p>
+    </div>
+
+    <!-- ボタン -->
+    <div class="sensor-box">
+      <h2>ボタン状態</h2>
+      <p>ボタンA: <span id="button-a" class="value">Released</span></p>
+      <p>ボタンB: <span id="button-b" class="value">Released</span></p>
+    </div>
+
+    <!-- サウンドセンサー -->
+    <div class="sensor-box">
+      <h2>サウンドセンサー</h2>
+      <p>音量レベル: <span id="sound-level" class="value">0</span></p>
+    </div>
+  </div>
+
+  <script>
+    // micro:bit のサービスUUID
+    const MICROBIT_SERVICES = {
+      ACCELEROMETER: {
+        SERVICE: 'e95d0753-251d-470a-a062-fa1922dfa9a8',
+        DATA: 'e95dca4b-251d-470a-a062-fa1922dfa9a8'
+      },
+      MAGNETOMETER: {
+        SERVICE: 'e95df2d8-251d-470a-a062-fa1922dfa9a8',
+        DATA: 'e95dfb11-251d-470a-a062-fa1922dfa9a8',
+        BEARING: 'e95d9715-251d-470a-a062-fa1922dfa9a8'
+      },
+      TEMPERATURE: {
+        SERVICE: 'e95d6100-251d-470a-a062-fa1922dfa9a8',
+        DATA: 'e95d9250-251d-470a-a062-fa1922dfa9a8'
+      },
+      BUTTON: {
+        SERVICE: 'e95d9882-251d-470a-a062-fa1922dfa9a8',
+        A_STATE: 'e95dda90-251d-470a-a062-fa1922dfa9a8',
+        B_STATE: 'e95dda91-251d-470a-a062-fa1922dfa9a8'
+      },
+      LIGHT: {
+        SERVICE: 'e95d0753-251d-470a-a062-fa1922dfa9a8',
+        DATA: 'e95d0752-251d-470a-a062-fa1922dfa9a8'
+      }
+    };
+
+    let isTablet = false;
+    let isPc = false;
+
+    // デバイスタイプの検出
+    function detectDevice() {
+      const userAgent = navigator.userAgent.toLowerCase();
+      if (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent)) {
+        isTablet = true;
+        document.getElementById('device-type').textContent = 'デバイスタイプ: タブレット/モバイル';
+      } else {
+        isPc = true;
+        document.getElementById('device-type').textContent = 'デバイスタイプ: PC';
+      }
+    }
+
+    // エラー表示
+    function showError(message) {
+      const errorElement = document.getElementById('error-message');
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+
+    // Bluetooth接続処理
+    async function connectMicrobit() {
+      try {
+        if (!navigator.bluetooth) {
+          throw new Error('Web Bluetooth APIがサポートされていません');
+        }
+
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: 'BBC micro:bit' }],
+          optionalServices: Object.values(MICROBIT_SERVICES).map(service => service.SERVICE)
+        });
+
+        const server = await device.gatt.connect();
+
+        // 各センサーの接続処理
+        await connectAccelerometer(server);
+        await connectMagnetometer(server);
+        await connectTemperature(server);
+        await connectButtons(server);
+        await connectLight(server);
+
+        device.addEventListener('gattserverdisconnected', onDisconnected);
+
+      } catch (error) {
+        showError(`接続エラー: ${error.message}`);
+        console.error('Bluetooth Error:', error);
+      }
+    }
+
+    // 各センサーの接続処理
+    async function connectAccelerometer(server) {
+      const service = await server.getPrimaryService(MICROBIT_SERVICES.ACCELEROMETER.SERVICE);
+      const characteristic = await service.getCharacteristic(MICROBIT_SERVICES.ACCELEROMETER.DATA);
+      await characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged', handleAccelerometer);
+    }
+
+    async function connectMagnetometer(server) {
+      const service = await server.getPrimaryService(MICROBIT_SERVICES.MAGNETOMETER.SERVICE);
+      const characteristic = await service.getCharacteristic(MICROBIT_SERVICES.MAGNETOMETER.DATA);
+      await characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged', handleMagnetometer);
+    }
+
+    async function connectTemperature(server) {
+      const service = await server.getPrimaryService(MICROBIT_SERVICES.TEMPERATURE.SERVICE);
+      const characteristic = await service.getCharacteristic(MICROBIT_SERVICES.TEMPERATURE.DATA);
+      await characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged', handleTemperature);
+    }
+
+    async function connectButtons(server) {
+      const service = await server.getPrimaryService(MICROBIT_SERVICES.BUTTON.SERVICE);
+      const buttonA = await service.getCharacteristic(MICROBIT_SERVICES.BUTTON.A_STATE);
+      const buttonB = await service.getCharacteristic(MICROBIT_SERVICES.BUTTON.B_STATE);
+
+      await buttonA.startNotifications();
+      await buttonB.startNotifications();
+
+      buttonA.addEventListener('characteristicvaluechanged', handleButtonA);
+      buttonB.addEventListener('characteristicvaluechanged', handleButtonB);
+    }
+
+    async function connectLight(server) {
+      const service = await server.getPrimaryService(MICROBIT_SERVICES.LIGHT.SERVICE);
+      const characteristic = await service.getCharacteristic(MICROBIT_SERVICES.LIGHT.DATA);
+      await characteristic.startNotifications();
+      characteristic.addEventListener('characteristicvaluechanged', handleLight);
+    }
+
+    // データハンドラー
+    function handleAccelerometer(event) {
+      const data = event.target.value;
+      document.getElementById('accel-x').textContent = data.getInt16(0, true);
+      document.getElementById('accel-y').textContent = data.getInt16(2, true);
+      document.getElementById('accel-z').textContent = data.getInt16(4, true);
+    }
+
+    function handleMagnetometer(event) {
+      const data = event.target.value;
+      document.getElementById('mag-x').textContent = data.getInt16(0, true);
+      document.getElementById('mag-y').textContent = data.getInt16(2, true);
+      document.getElementById('mag-z').textContent = data.getInt16(4, true);
+    }
+
+    function handleTemperature(event) {
+      const data = event.target.value;
+      document.getElementById('temperature').textContent = data.getInt8(0);
+    }
+
+    function handleButtonA(event) {
+      const pressed = event.target.value.getUint8(0);
+      document.getElementById('button-a').textContent = pressed ? 'Pressed' : 'Released';
+    }
+
+    function handleButtonB(event) {
+      const pressed = event.target.value.getUint8(0);
+      document.getElementById('button-b').textContent = pressed ? 'Pressed' : 'Released';
+    }
+
+    function handleLight(event) {
+      const data = event.target.value;
+      document.getElementById('light').textContent = data.getUint8(0);
+    }
+
+    function onDisconnected() {
+      showError('デバイスが切断されました');
+    }
+
+    // 初期化
+    window.onload = function () {
+      detectDevice();
+      document.getElementById('connect-button').addEventListener('click', connectMicrobit);
+    };
+  </script>
+</body>
+
+</html>
