@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>単語帳アプリ</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    :root {
+      --gradient: linear-gradient(135deg, #4CAF50, #2196F3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+    }
+
+    #app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: white;
+      padding: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 1rem;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #eee;
+    }
+
+    .stats-info {
+      display: flex;
+      justify-content: space-around;
+      font-size: 0.9rem;
+    }
+
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      border: 1px solid #eee;
+      cursor: pointer;
+    }
+
+    .question {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .answer {
+      font-size: 1.2rem;
+      color: #666;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .answer-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .correct-btn {
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+    }
+
+    .incorrect-btn {
+      background: linear-gradient(135deg, #f44336, #e53935);
+    }
+
+    .quiz-buttons {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      margin: 2rem 0;
+    }
+
+    button {
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .start-screen {
+      text-align: center;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .start-screen h1 {
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .scores-history {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .score-item {
+      padding: 0.5rem;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .next-button {
+      width: 100%;
+      background: var(--gradient);
+    }
+
+    @media (min-width: 768px) {
+      .main-content {
+        padding: 2rem;
+      }
+
+      .card {
+        padding: 3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <header v-if="isStarted">
+      <button @click="endQuiz" class="end-btn" style="background: #dc3545;">終了</button>
+    </header>
+    <main class="main-content">
+      <div v-if="!isStarted" class="start-screen">
+        <h1>単語帳アプリ</h1>
+
+        <div class="quiz-buttons">
+          <button v-for="quiz in availableQuizzes" :key="quiz" @click="selectAndStartQuiz(quiz)"
+            style="background: var(--gradient)">
+            {{ quiz }}
+          </button>
+        </div>
+
+        <div class="scores-history">
+          <h2>学習履歴</h2>
+          <div v-for="(score, index) in allScores" :key="index" class="score-item">
+            <p>ファイル: {{ score.quiz }}</p>
+            <p>日時: {{ score.timestamp }}</p>
+            <p>正答率: {{ score.accuracy }}%</p>
+            <p>回答数: {{ score.total }}問</p>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="quiz-container">
+        <div class="stats-card">
+          <div class="stats-info">
+            <span>残り: {{ remainingQuestions }}問</span>
+            <span>正解: {{ correctAnswers }}問</span>
+            <span>不正解: {{ incorrectAnswers }}問</span>
+            <span>正答率: {{ accuracy }}%</span>
+          </div>
+        </div>
+
+        <div v-if="currentQuestion" class="card" @click="showAnswer">
+          <div class="question">{{ currentQuestion.question }}</div>
+          <div v-show="isAnswerVisible" class="answer">
+            {{ currentQuestion.answer }}
+            <div v-if="currentQuestion.note" class="note">{{ currentQuestion.note }}</div>
+          </div>
+        </div>
+
+        <div v-if="isAnswerVisible" class="answer-buttons">
+          <button @click="handleAnswer(true)" class="correct-btn">正解</button>
+          <button @click="handleAnswer(false)" class="incorrect-btn">不正解</button>
+        </div>
+
+        <button v-if="!isAnswerVisible" @click="showAnswer" class="next-button">
+          答えを表示
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const { createApp } = Vue
+
+    const csvFiles = [
+      'minpo.csv',
+      'kenpo.csv',
+      'tokkyoho.csv'
+    ]
+
+    createApp({
+      data() {
+        return {
+          questions: [],
+          currentIndex: 0,
+          isAnswerVisible: false,
+          isStarted: false,
+          correctAnswers: 0,
+          incorrectAnswers: 0,
+          answeredQuestions: 0,
+          selectedQuiz: '',
+          availableQuizzes: [],
+          allScores: []
+        }
+      },
+      computed: {
+        currentQuestion() {
+          return this.questions[this.currentIndex] || null
+        },
+        remainingQuestions() {
+          return this.questions.length - this.currentIndex
+        },
+        accuracy() {
+          if (this.answeredQuestions === 0) return 0
+          return Math.round((this.correctAnswers / this.answeredQuestions) * 100)
+        }
+      },
+      methods: {
+        async checkAvailableQuizzes() {
+          this.availableQuizzes = []
+          for (const file of csvFiles) {
+            try {
+              const response = await fetch(file)
+              if (response.ok) {
+                this.availableQuizzes.push(file)
+              }
+            } catch (error) {
+              console.log(`${file} is not available`)
+            }
+          }
+        },
+        loadScores() {
+          const scores = localStorage.getItem('quiz_scores')
+          this.allScores = scores ? JSON.parse(scores) : []
+        },
+        saveScore() {
+          const score = {
+            quiz: this.selectedQuiz,
+            accuracy: this.accuracy,
+            total: this.answeredQuestions,
+            timestamp: new Date().toLocaleString()
+          }
+          this.allScores.unshift(score)
+          localStorage.setItem('quiz_scores', JSON.stringify(this.allScores))
+        },
+        async loadQuizData(filename) {
+          try {
+            const response = await fetch(filename)
+            if (!response.ok) throw new Error('File not found')
+            const data = await response.text()
+            this.questions = data.split('\n')
+              .filter(line => line.trim())
+              .map(line => {
+                const [question, answer, note = ''] = line.split(',').map(item => item.trim())
+                return { question, answer, note }
+              })
+              .filter(q => q.question && q.answer) // 問題と答えが両方存在する行のみを残す
+            this.shuffle()
+            return true
+          } catch (error) {
+            console.error('Failed to load quiz:', error)
+            return false
+          }
+        },
+        async selectAndStartQuiz(filename) {
+          this.selectedQuiz = filename
+          if (await this.loadQuizData(filename)) {
+            this.startQuiz()
+          }
+        },
+        showAnswer() {
+          this.isAnswerVisible = true
+        },
+        handleAnswer(isCorrect) {
+          if (isCorrect) {
+            this.correctAnswers++
+          } else {
+            this.incorrectAnswers++
+          }
+          this.answeredQuestions++
+          this.nextQuestion()
+        },
+        nextQuestion() {
+          if (this.currentIndex < this.questions.length - 1) {
+            this.currentIndex++
+            this.isAnswerVisible = false
+          } else {
+            this.endQuiz()
+          }
+        },
+        endQuiz() {
+          this.saveScore()
+          this.isStarted = false
+          alert('クイズを終了しました！')
+          location.reload()
+        },
+        shuffle() {
+          for (let i = this.questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.questions[i], this.questions[j]] = [this.questions[j], this.questions[i]]
+          }
+          this.currentIndex = 0
+          this.isAnswerVisible = false
+        },
+        startQuiz() {
+          this.isStarted = true
+          this.correctAnswers = 0
+          this.incorrectAnswers = 0
+          this.answeredQuestions = 0
+          this.currentIndex = 0
+          this.isAnswerVisible = false
+        }
+      },
+      mounted() {
+        this.checkAvailableQuizzes()
+        this.loadScores()
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
