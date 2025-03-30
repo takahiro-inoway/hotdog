@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ワークメンタリティ診断</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4A6FFF;
+      --secondary-color: #F0F4FF;
+      --text-color: #333;
+      --light-text: #666;
+      --border-color: #E5E7EB;
+      --success-color: #34D399;
+      --danger-color: #F87171;
+      --sidebar-width: 280px;
+      --header-height: 64px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #FAFAFA;
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: white;
+      border-right: 1px solid var(--border-color);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      overflow-y: auto;
+      z-index: 10;
+      transition: var(--transition);
+    }
+
+    .sidebar-hidden .sidebar {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-color);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-logo i {
+      margin-right: 12px;
+      font-size: 24px;
+    }
+
+    .sidebar-menu {
+      padding: 20px 0;
+    }
+
+    .sidebar-menu-title {
+      padding: 8px 20px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--light-text);
+      margin-top: 8px;
+    }
+
+    .sidebar-menu-item {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+
+    .sidebar-menu-item i {
+      margin-right: 12px;
+      font-size: 20px;
+    }
+
+    .sidebar-menu-item:hover,
+    .sidebar-menu-item.active {
+      background-color: var(--secondary-color);
+      color: var(--primary-color);
+    }
+
+    .user-profile {
+      padding: 20px;
+      border-top: 1px solid var(--border-color);
+      margin-top: auto;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: white;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-right: 12px;
+    }
+
+    .user-name {
+      font-weight: 500;
+    }
+
+    .user-role {
+      font-size: 12px;
+      color: var(--light-text);
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      transition: var(--transition);
+    }
+
+    .sidebar-hidden .main-content {
+      margin-left: 0;
+    }
+
+    .header {
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      background-color: white;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 24px;
+      margin-right: 16px;
+      cursor: pointer;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .content {
+      padding: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .container {
+      background-color: white;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--primary-color);
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 8px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: white;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+
+    .btn-danger {
+      background-color: var(--danger-color);
+    }
+
+    .btn-full {
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .question-box {
+      background-color: var(--secondary-color);
+      padding: 24px;
+      border-radius: 8px;
+      margin: 24px 0;
+      font-size: 18px;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      margin: 32px 0;
+      flex-wrap: wrap;
+    }
+
+    .option {
+      flex-basis: 18%;
+      background-color: white;
+      border: 1px solid var(--border-color);
+      padding: 16px 8px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .option.selected {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .option:hover {
+      border-color: var(--primary-color);
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .progress {
+      font-size: 14px;
+      color: var(--light-text);
+    }
+
+    .results {
+      margin-top: 24px;
+    }
+
+    .result-item {
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 16px;
+    }
+
+    .result-item h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .result-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .thank-you {
+      text-align: center;
+      padding: 32px 0;
+    }
+
+    .thank-you h2 {
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+
+    .survey-card {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 16px;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .survey-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    .survey-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background-color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+
+    .survey-info {
+      flex: 1;
+    }
+
+    .survey-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .survey-description {
+      font-size: 14px;
+      color: var(--light-text);
+    }
+
+    .survey-action {
+      margin-left: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      font-size: 16px;
+      transition: var(--transition);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .form-error {
+      color: var(--danger-color);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .welcome-banner {
+      background-color: var(--secondary-color);
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .welcome-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--primary-color);
+    }
+
+    .welcome-subtitle {
+      color: var(--light-text);
+      margin-bottom: 16px;
+    }
+
+    .past-results {
+      margin-top: 32px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar-visible .sidebar {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .options {
+        flex-direction: column;
+      }
+
+      .option {
+        flex-basis: 100%;
+        margin-bottom: 8px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" :class="{'sidebar-hidden': !sidebarVisible, 'sidebar-visible': sidebarVisible}">
+    <div class="app-container">
+      <!-- サイドバー -->
+      <div class="sidebar">
+        <div class="sidebar-logo">
+          <i class="ri-psychology-fill"></i>
+          <span>メンタリティApp</span>
+        </div>
+
+        <div class="sidebar-menu">
+          <div class="sidebar-menu-title">メニュー</div>
+          <div class="sidebar-menu-item" :class="{ active: currentPage === 'home' }" @click="navigateTo('home')">
+            <i class="ri-home-5-line"></i>
+            <span>ホーム</span>
+          </div>
+
+          <div class="sidebar-menu-item" :class="{ active: currentPage === 'surveys' }" @click="navigateTo('surveys')">
+            <i class="ri-survey-line"></i>
+            <span>診断一覧</span>
+          </div>
+
+          <div class="sidebar-menu-item" :class="{ active: currentPage === 'results' }" @click="navigateTo('results')">
+            <i class="ri-bar-chart-box-line"></i>
+            <span>診断結果</span>
+          </div>
+
+          <div class="sidebar-menu-title">アカウント</div>
+          <div class="sidebar-menu-item" :class="{ active: currentPage === 'profile' }" @click="navigateTo('profile')">
+            <i class="ri-user-settings-line"></i>
+            <span>プロフィール</span>
+          </div>
+
+          <div class="sidebar-menu-item" @click="logout">
+            <i class="ri-logout-box-r-line"></i>
+            <span>ログアウト</span>
+          </div>
+        </div>
+
+        <div class="user-profile" v-if="isLoggedIn">
+          <div class="user-info">
+            <div class="user-avatar">{{ userInitials }}</div>
+            <div>
+              <div class="user-name">{{ user.name }}</div>
+              <div class="user-role">{{ user.role }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- メインコンテンツ -->
+      <div class="main-content">
+        <div class="header">
+          <div class="menu-toggle" @click="toggleSidebar">
+            <i class="ri-menu-line"></i>
+          </div>
+          <div class="header-title">{{ pageTitle }}</div>
+        </div>
+
+        <div class="content">
+          <!-- ログイン画面 -->
+          <div v-if="!isLoggedIn">
+            <div class="container">
+              <h1>ログイン</h1>
+              <form @submit.prevent="login">
+                <div class="form-group">
+                  <label class="form-label">ユーザーID</label>
+                  <input type="text" class="form-input" v-model="loginForm.username" required placeholder="ユーザーIDを入力">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">パスワード</label>
+                  <input type="password" class="form-input" v-model="loginForm.password" required
+                    placeholder="パスワードを入力">
+                </div>
+
+                <div class="form-error" v-if="loginError">
+                  {{ loginError }}
+                </div>
+
+                <button type="submit" class="btn btn-full">ログイン</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- ホーム画面 -->
+          <div v-else-if="currentPage === 'home'">
+            <div class="welcome-banner">
+              <div class="welcome-title">こんにちは、{{ user.name }}さん</div>
+              <div class="welcome-subtitle">今日もあなたのメンタリティを診断しましょう</div>
+            </div>
+
+            <div class="container">
+              <h2>おすすめの診断</h2>
+              <div class="survey-card" @click="startSurvey('work')">
+                <div class="survey-icon"><i class="ri-briefcase-4-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">ワークメンタリティ診断</div>
+                  <div class="survey-description">あなたの仕事に対する姿勢や考え方を診断します</div>
+                </div>
+                <div class="survey-action">
+                  <i class="ri-arrow-right-line"></i>
+                </div>
+              </div>
+
+              <div class="survey-card" @click="startSurvey('stress')">
+                <div class="survey-icon"><i class="ri-mental-health-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">ストレス診断</div>
+                  <div class="survey-description">現在のストレスレベルを測定します</div>
+                </div>
+                <div class="survey-action">
+                  <i class="ri-arrow-right-line"></i>
+                </div>
+              </div>
+
+              <div class="survey-card" @click="startSurvey('motivation')">
+                <div class="survey-icon"><i class="ri-battery-charge-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">モチベーション診断</div>
+                  <div class="survey-description">あなたのモチベーションタイプを分析します</div>
+                </div>
+                <div class="survey-action">
+                  <i class="ri-arrow-right-line"></i>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="hasPreviousResults" class="container past-results">
+              <h2>最近の診断結果</h2>
+
+              <div v-if="previousResults.work" class="result-item">
+                <h3>ワークメンタリティ診断</h3>
+                <div class="result-value">{{ previousResults.work.score }}/50点</div>
+                <div>診断日: {{ formatDate(previousResults.work.date) }}</div>
+              </div>
+
+              <div v-if="previousResults.stress" class="result-item">
+                <h3>ストレス診断</h3>
+                <div class="result-value">{{ previousResults.stress.score }}/50点</div>
+                <div>診断日: {{ formatDate(previousResults.stress.date) }}</div>
+              </div>
+
+              <div v-if="previousResults.motivation" class="result-item">
+                <h3>モチベーション診断</h3>
+                <div class="result-value">{{ previousResults.motivation.score }}/50点</div>
+                <div>診断日: {{ formatDate(previousResults.motivation.date) }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 診断一覧画面 -->
+          <div v-else-if="currentPage === 'surveys'">
+            <div class="container">
+              <h1>診断一覧</h1>
+
+              <div class="survey-card" @click="startSurvey('work')">
+                <div class="survey-icon"><i class="ri-briefcase-4-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">ワークメンタリティ診断</div>
+                  <div class="survey-description">あなたの仕事に対する姿勢や考え方を診断します</div>
+                </div>
+                <div class="survey-action">
+                  <button class="btn">診断開始</button>
+                </div>
+              </div>
+
+              <div class="survey-card" @click="startSurvey('stress')">
+                <div class="survey-icon"><i class="ri-mental-health-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">ストレス診断</div>
+                  <div class="survey-description">現在のストレスレベルを測定します</div>
+                </div>
+                <div class="survey-action">
+                  <button class="btn">診断開始</button>
+                </div>
+              </div>
+
+              <div class="survey-card" @click="startSurvey('motivation')">
+                <div class="survey-icon"><i class="ri-battery-charge-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">モチベーション診断</div>
+                  <div class="survey-description">あなたのモチベーションタイプを分析します</div>
+                </div>
+                <div class="survey-action">
+                  <button class="btn">診断開始</button>
+                </div>
+              </div>
+
+              <div class="survey-card" @click="startSurvey('leadership')">
+                <div class="survey-icon"><i class="ri-team-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">リーダーシップ診断</div>
+                  <div class="survey-description">あなたのリーダーシップスタイルを分析します</div>
+                </div>
+                <div class="survey-action">
+                  <button class="btn">診断開始</button>
+                </div>
+              </div>
+
+              <div class="survey-card" @click="startSurvey('communication')">
+                <div class="survey-icon"><i class="ri-chat-3-line"></i></div>
+                <div class="survey-info">
+                  <div class="survey-title">コミュニケーション診断</div>
+                  <div class="survey-description">あなたのコミュニケーションスタイルを診断します</div>
+                </div>
+                <div class="survey-action">
+                  <button class="btn">診断開始</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 診断結果一覧画面 -->
+          <div v-else-if="currentPage === 'results'">
+            <div class="container">
+              <h1>診断結果履歴</h1>
+
+              <div v-if="hasPreviousResults">
+                <div v-if="previousResults.work" class="result-item">
+                  <h3>ワークメンタリティ診断</h3>
+                  <div class="result-value">{{ previousResults.work.score }}/50点</div>
+                  <div>診断日: {{ formatDate(previousResults.work.date) }}</div>
+                </div>
+
+                <div v-if="previousResults.stress" class="result-item">
+                  <h3>ストレス診断</h3>
+                  <div class="result-value">{{ previousResults.stress.score }}/50点</div>
+                  <div>診断日: {{ formatDate(previousResults.stress.date) }}</div>
+                </div>
+
+                <div v-if="previousResults.motivation" class="result-item">
+                  <h3>モチベーション診断</h3>
+                  <div class="result-value">{{ previousResults.motivation.score }}/50点</div>
+                  <div>診断日: {{ formatDate(previousResults.motivation.date) }}</div>
+                </div>
+
+                <div v-if="previousResults.leadership" class="result-item">
+                  <h3>リーダーシップ診断</h3>
+                  <div class="result-value">{{ previousResults.leadership.score }}/50点</div>
+                  <div>診断日: {{ formatDate(previousResults.leadership.date) }}</div>
+                </div>
+
+                <div v-if="previousResults.communication" class="result-item">
+                  <h3>コミュニケーション診断</h3>
+                  <div class="result-value">{{ previousResults.communication.score }}/50点</div>
+                  <div>診断日: {{ formatDate(previousResults.communication.date) }}</div>
+                </div>
+              </div>
+
+              <div v-else>
+                <p>まだ診断結果がありません。診断を受けると結果が表示されます。</p>
+                <button @click="navigateTo('surveys')" class="btn btn-full">診断を受ける</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- プロフィール画面 -->
+          <div v-else-if="currentPage === 'profile'">
+            <div class="container">
+              <h1>プロフィール</h1>
+
+              <div class="form-group">
+                <label class="form-label">ユーザーID</label>
+                <input type="text" class="form-input" v-model="user.username" disabled>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">名前</label>
+                <input type="text" class="form-input" v-model="user.name">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">役職</label>
+                <input type="text" class="form-input" v-model="user.role">
+              </div>
+
+              <button class="btn btn-full">プロフィールを更新</button>
+            </div>
+          </div>
+
+          <!-- アンケート画面 -->
+          <div v-else-if="currentPage === 'survey'">
+            <div class="container">
+              <div class="question-header">
+                <button @click="cancelSurvey" class="btn btn-secondary">中断する</button>
+                <div class="progress">質問 {{ currentQuestionIndex + 1 }}/{{ currentSurveyQuestions.length }}</div>
+              </div>
+
+              <div class="question-box">
+                {{ currentSurveyQuestions[currentQuestionIndex].text }}
+              </div>
+
+              <div class="options">
+                <div v-for="(option, index) in options" :key="index" class="option"
+                  :class="{ selected: selectedOption === index }" @click="selectOption(index)">
+                  {{ option }}
+                </div>
+              </div>
+
+              <button @click="nextQuestion" class="btn btn-full" :disabled="selectedOption === null"
+                :style="{ opacity: selectedOption === null ? 0.5 : 1 }">
+                {{ currentQuestionIndex === currentSurveyQuestions.length - 1 ? '診断を完了する' : '次の質問へ' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 完了画面 -->
+          <div v-else-if="currentPage === 'completed'">
+            <div class="container">
+              <div class="thank-you">
+                <h2>お疲れ様でした！</h2>
+                <div class="results">
+                  <div class="result-item">
+                    <h3>{{ surveyTitles[currentSurveyType] }}</h3>
+                    <div class="result-value">{{ calculateScore() }}/50点</div>
+                  </div>
+                </div>
+                <button @click="navigateTo('home')" class="btn">TOPに戻る</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createApp, ref, computed, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+    createApp({
+      setup() {
+        const isLoggedIn = ref(false);
+        const sidebarVisible = ref(true);
+        const currentPage = ref('home');
+        const currentSurveyType = ref('');
+        const currentQuestionIndex = ref(0);
+        const selectedOption = ref(null);
+        const answers = ref([]);
+        const loginForm = ref({
+          username: '',
+          password: ''
+        });
+        const loginError = ref('');
+        const user = ref({
+          username: 'user1',
+          name: '山田 太郎',
+          role: 'マネージャー'
+        });
+        const hasPreviousResults = ref(false);
+        const previousResults = ref({
+          work: null,
+          stress: null,
+          motivation: null,
+          leadership: null,
+          communication: null
+        });
+        const options = ref([
+          'そう思う',
+          'どちらかといえばそう思う',
+          'わからない',
+          'どちらかと言えば違う',
+          '違う'
+        ]);
+        const surveyTitles = ref({
+          work: 'ワークメンタリティ診断',
+          stress: 'ストレス診断',
+          motivation: 'モチベーション診断',
+          leadership: 'リーダーシップ診断',
+          communication: 'コミュニケーション診断'
+        });
+        const surveyQuestions = ref({
+          work: [
+            { text: '仕事において常に高い目標を設定している' },
+            { text: '困難な課題があっても粘り強く取り組むことができる' },
+            { text: '新しいスキルを習得することに意欲的である' },
+            { text: 'チームの一員として責任を持って行動している' },
+            { text: '仕事の優先順位を効果的に決めることができる' },
+            { text: '失敗から学び、次に活かすことができる' },
+            { text: 'ストレスがあっても冷静に対応できる' },
+            { text: 'ストレスがあっても冷静に対応できる' },
+            { text: '他者の意見に耳を傾け、柔軟に考えを取り入れられる' },
+            { text: '自分の強みと弱みを客観的に理解している' },
+            { text: '仕事に対して情熱と目的意識を持っている' }
+          ],
+          stress: [
+            { text: '最近、仕事のことが頭から離れない' },
+            { text: '小さなことでもイライラすることがある' },
+            { text: '疲れやすく、休息しても回復しない感じがする' },
+            { text: '睡眠の質が低下している' },
+            { text: '食欲の変化を感じる' },
+            { text: '集中力が続かないことがある' },
+            { text: '身体的な不調（頭痛、肩こりなど）を感じる' },
+            { text: '仕事のミスが増えた気がする' },
+            { text: '趣味や楽しみに対する興味が減った' },
+            { text: '将来に対して不安を感じることが多い' }
+          ],
+          motivation: [
+            { text: '自分の成長につながる仕事にやりがいを感じる' },
+            { text: '難しい課題に挑戦することが好きだ' },
+            { text: '他者から認められることでやる気が出る' },
+            { text: '目標を達成するために計画的に行動できる' },
+            { text: '自分の仕事が社会や他者の役に立っていると感じたい' },
+            { text: '金銭的な報酬は大きなモチベーション要因だ' },
+            { text: '自分のペースで仕事を進めたいと思う' },
+            { text: 'チームで成果を出すことにやりがいを感じる' },
+            { text: '自分の専門性を高めることに意欲的だ' },
+            { text: '将来のキャリアについて明確なビジョンがある' }
+          ],
+          leadership: [
+            { text: 'チームの目標を明確に設定し共有している' },
+            { text: 'メンバーの強みを活かした役割分担を心がけている' },
+            { text: 'メンバーの成長をサポートすることが重要だと思う' },
+            { text: '困難な状況でも冷静に判断できる' },
+            { text: 'メンバーの意見に耳を傾け、フィードバックを大切にしている' },
+            { text: '率先して行動し、模範を示すことを心がけている' },
+            { text: '変化に柔軟に対応できる' },
+            { text: 'チーム内の対立を効果的に解決できる' },
+            { text: '長期的な視点でチームの方向性を考えている' },
+            { text: 'メンバーの多様性を尊重し活かすことができる' }
+          ],
+          communication: [
+            { text: '自分の考えを明確に伝えることができる' },
+            { text: '相手の話をしっかり聞くことができる' },
+            { text: '非言語コミュニケーション（表情、姿勢など）に気を配っている' },
+            { text: '異なる意見や価値観を受け入れることができる' },
+            { text: '状況や相手に合わせてコミュニケーションスタイルを変えられる' },
+            { text: '感情的にならずに議論できる' },
+            { text: '相手の立場や気持ちを理解しようとしている' },
+            { text: 'フィードバックを建設的に伝えることができる' },
+            { text: '複雑な内容をわかりやすく説明できる' },
+            { text: 'オンラインでのコミュニケーションも効果的に行える' }
+          ]
+        });
+
+        const pageTitle = computed(() => {
+          if (currentPage.value === 'home') return 'ホーム';
+          if (currentPage.value === 'surveys') return '診断一覧';
+          if (currentPage.value === 'results') return '診断結果履歴';
+          if (currentPage.value === 'profile') return 'プロフィール';
+          if (currentPage.value === 'survey') return surveyTitles.value[currentSurveyType.value];
+          if (currentPage.value === 'completed') return '診断完了';
+          return '';
+        });
+
+        const userInitials = computed(() => {
+          if (!user.value.name) return '';
+          return user.value.name.split(' ').map(n => n[0]).join('');
+        });
+
+        const currentSurveyQuestions = computed(() => {
+          return surveyQuestions.value[currentSurveyType.value] || [];
+        });
+
+        function toggleSidebar() {
+          sidebarVisible.value = !sidebarVisible.value;
+        }
+
+        function navigateTo(page) {
+          currentPage.value = page;
+        }
+
+        function startSurvey(type) {
+          currentSurveyType.value = type;
+          currentPage.value = 'survey';
+          currentQuestionIndex.value = 0;
+          selectedOption.value = null;
+          answers.value = [];
+        }
+
+        function cancelSurvey() {
+          if (confirm('診断を中断してもよろしいですか？入力した内容は保存されません。')) {
+            navigateTo('home');
+          }
+        }
+
+        function selectOption(index) {
+          selectedOption.value = index;
+        }
+
+        function nextQuestion() {
+          if (selectedOption.value === null) return;
+
+          answers.value[currentQuestionIndex.value] = selectedOption.value;
+
+          if (currentQuestionIndex.value < currentSurveyQuestions.value.length - 1) {
+            currentQuestionIndex.value++;
+            selectedOption.value = null;
+          } else {
+            completeSurvey();
+          }
+        }
+
+        function completeSurvey() {
+          const score = calculateScore();
+          saveResult(score);
+          currentPage.value = 'completed';
+        }
+
+        function calculateScore() {
+          return answers.value.reduce((total, answer) => {
+            // 回答に応じて5〜1点を付与（そう思う=5点、違う=1点）
+            return total + (5 - answer);
+          }, 0);
+        }
+
+        function saveResult(score) {
+          const result = {
+            score: score,
+            date: new Date().toISOString()
+          };
+
+          // Cookie に保存
+          document.cookie = `${currentSurveyType.value}Result=${JSON.stringify(result)}; max-age=31536000; path=/`;
+
+          // 履歴データを更新
+          previousResults.value[currentSurveyType.value] = result;
+          hasPreviousResults.value = true;
+        }
+
+        function checkPreviousResults() {
+          const cookies = document.cookie.split(';');
+          let hasAnyResult = false;
+
+          for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+
+            Object.keys(surveyTitles.value).forEach(type => {
+              if (name === `${type}Result`) {
+                try {
+                  previousResults.value[type] = JSON.parse(value);
+                  hasAnyResult = true;
+                } catch (e) {
+                  console.error('Cookie解析エラー:', e);
+                }
+              }
+            });
+          }
+
+          hasPreviousResults.value = hasAnyResult;
+        }
+
+        function formatDate(dateString) {
+          if (!dateString) return '';
+          const date = new Date(dateString);
+          return `\${date.getFullYear()}年\${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+
+        function login() {
+          // ダミーのログイン認証（実際の実装ではサーバーサイドでの認証が必要）
+          const validCredentials = [
+            { username: 'user1', password: 'password1' },
+            { username: 'user2', password: 'password2' },
+            { username: 'admin', password: 'admin123' }
+          ];
+
+          const foundUser = validCredentials.find(
+            cred => cred.username === loginForm.value.username && cred.password === loginForm.value.password
+          );
+
+          if (foundUser) {
+            isLoggedIn.value = true;
+            user.value.username = foundUser.username;
+            loginError.value = '';
+            currentPage.value = 'home';
+
+            // ログイン情報をセッションに保存（デモ用）
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('username', foundUser.username);
+          } else {
+            loginError.value = 'ユーザーIDまたはパスワードが正しくありません';
+          }
+        }
+
+        function logout() {
+          if (confirm('ログアウトしますか？')) {
+            isLoggedIn.value = false;
+            loginForm.value = { username: '', password: '' };
+            sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('username');
+          }
+        }
+
+        onMounted(() => {
+          checkPreviousResults();
+          // デモ用に自動ログイン（実際の実装では削除してください）
+          // isLoggedIn.value = true;
+        });
+
+        return {
+          isLoggedIn,
+          sidebarVisible,
+          currentPage,
+          currentSurveyType,
+          currentQuestionIndex,
+          selectedOption,
+          answers,
+          loginForm,
+          loginError,
+          user,
+          hasPreviousResults,
+          previousResults,
+          options,
+          surveyTitles,
+          surveyQuestions,
+          pageTitle,
+          userInitials,
+          currentSurveyQuestions,
+          toggleSidebar,
+          navigateTo,
+          startSurvey,
+          cancelSurvey,
+          selectOption,
+          nextQuestion,
+          completeSurvey,
+          calculateScore,
+          saveResult,
+          checkPreviousResults,
+          formatDate,
+          login,
+          logout
+        };
+      }
+    }).mount('#app');
+  </script>
+
+</body>
+
+</html>
